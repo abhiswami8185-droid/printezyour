@@ -1,0 +1,6 @@
+{
+  "name": "PrintezYour - Modern Printing & E-Commerce System",
+  "description": "Official website, online custom printing ordering system, and business management portal for PrintezYour (Chandigarh).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

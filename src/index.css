@@ -1,0 +1,135 @@
+@import "tailwindcss";
+
+@layer components {
+  /* 3D Dimensional Primary Button */
+  .btn-3d-primary {
+    @apply relative font-bold text-white transition-all duration-150 select-none cursor-pointer inline-flex items-center justify-center;
+    background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
+    box-shadow: 0 4px 0 0 #1e3a8a, 0 6px 14px rgba(29, 78, 216, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    border-radius: 0.75rem;
+  }
+  .btn-3d-primary:hover {
+    background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+    box-shadow: 0 4px 0 0 #1e3a8a, 0 8px 18px rgba(29, 78, 216, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+  .btn-3d-primary:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 0 #1e3a8a, 0 2px 4px rgba(29, 78, 216, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+
+  /* 3D Dimensional Cyan Button */
+  .btn-3d-cyan {
+    @apply relative font-bold text-slate-950 transition-all duration-150 select-none cursor-pointer inline-flex items-center justify-center;
+    background: linear-gradient(180deg, #22d3ee 0%, #06b6d4 100%);
+    box-shadow: 0 4px 0 0 #0e7490, 0 6px 14px rgba(6, 182, 212, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    border-radius: 0.75rem;
+  }
+  .btn-3d-cyan:hover {
+    background: linear-gradient(180deg, #67e8f9 0%, #0891b2 100%);
+    box-shadow: 0 4px 0 0 #0e7490, 0 8px 18px rgba(6, 182, 212, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  }
+  .btn-3d-cyan:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 0 #0e7490, 0 2px 4px rgba(6, 182, 212, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+
+  /* 3D Dimensional Amber Button */
+  .btn-3d-amber {
+    @apply relative font-bold text-slate-950 transition-all duration-150 select-none cursor-pointer inline-flex items-center justify-center;
+    background: linear-gradient(180deg, #fbbf24 0%, #d97706 100%);
+    box-shadow: 0 4px 0 0 #92400e, 0 6px 14px rgba(217, 119, 6, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    border-radius: 0.75rem;
+  }
+  .btn-3d-amber:hover {
+    background: linear-gradient(180deg, #fcd34d 0%, #b45309 100%);
+    box-shadow: 0 4px 0 0 #92400e, 0 8px 18px rgba(217, 119, 6, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  }
+  .btn-3d-amber:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 0 #92400e, 0 2px 4px rgba(217, 119, 6, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+
+  /* 3D Dimensional Emerald Button */
+  .btn-3d-emerald {
+    @apply relative font-bold text-white transition-all duration-150 select-none cursor-pointer inline-flex items-center justify-center;
+    background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+    box-shadow: 0 4px 0 0 #065f46, 0 6px 14px rgba(5, 150, 105, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    border-radius: 0.75rem;
+  }
+  .btn-3d-emerald:hover {
+    background: linear-gradient(180deg, #34d399 0%, #047857 100%);
+    box-shadow: 0 4px 0 0 #065f46, 0 8px 18px rgba(5, 150, 105, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+  .btn-3d-emerald:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 0 #065f46, 0 2px 4px rgba(5, 150, 105, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+
+  /* 3D Dimensional Dark Button */
+  .btn-3d-dark {
+    @apply relative font-bold text-white transition-all duration-150 select-none cursor-pointer inline-flex items-center justify-center;
+    background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
+    box-shadow: 0 4px 0 0 #0f172a, 0 6px 14px rgba(15, 23, 42, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    border-radius: 0.75rem;
+  }
+  .btn-3d-dark:hover {
+    background: linear-gradient(180deg, #475569 0%, #0f172a 100%);
+    box-shadow: 0 4px 0 0 #0f172a, 0 8px 18px rgba(15, 23, 42, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
+  .btn-3d-dark:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 0 #0f172a, 0 2px 4px rgba(15, 23, 42, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+
+  /* Premium 3D Navigation Button */
+  .nav-3d-btn {
+    @apply relative font-semibold text-slate-700 transition-all duration-150 select-none cursor-pointer inline-flex items-center justify-center text-xs sm:text-sm px-3.5 py-2 rounded-xl;
+    background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 3px 0 0 #94a3b8, 0 4px 6px -1px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+  .nav-3d-btn:hover {
+    color: #0369a1;
+    background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 0 0 #94a3b8, 0 6px 12px -2px rgba(15, 23, 42, 0.12), inset 0 1px 0 rgba(255, 255, 255, 1);
+  }
+  .nav-3d-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 0 #94a3b8, 0 2px 4px rgba(15, 23, 42, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  }
+
+  /* Active/Selected 3D Navigation Button */
+  .nav-3d-btn-active {
+    @apply relative font-bold text-white transition-all duration-150 select-none cursor-pointer inline-flex items-center justify-center text-xs sm:text-sm px-3.5 py-2 rounded-xl;
+    background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
+    border: 1px solid #0284c7;
+    box-shadow: 0 3px 0 0 #075985, 0 5px 10px rgba(2, 132, 199, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+  .nav-3d-btn-active:hover {
+    background: linear-gradient(180deg, #0369a1 0%, #075985 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 0 0 #075985, 0 7px 14px rgba(2, 132, 199, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  }
+  .nav-3d-btn-active:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 0 #075985, 0 2px 4px rgba(2, 132, 199, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+
+  /* Accent 3D Button (Request Quote) */
+  .nav-3d-btn-accent {
+    @apply relative font-bold text-slate-950 transition-all duration-150 select-none cursor-pointer inline-flex items-center justify-center text-xs sm:text-sm px-4 py-2 rounded-xl;
+    background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+    border: 1px solid #38bdf8;
+    box-shadow: 0 3px 0 0 #0369a1, 0 5px 12px rgba(2, 132, 199, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  }
+  .nav-3d-btn-accent:hover {
+    background: linear-gradient(180deg, #7dd3fc 0%, #0369a1 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 0 0 #0369a1, 0 8px 16px rgba(2, 132, 199, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+  .nav-3d-btn-accent:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 0 #0369a1, 0 2px 4px rgba(2, 132, 199, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+}

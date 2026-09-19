@@ -1,0 +1,178 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 280" width="100%" height="100%" fill="none">
+  <defs>
+    <!-- Master Brand Gradients from Official Logo -->
+    <!-- Printer Charcoal Casing Gradient -->
+    <linearGradient id="pzCharcoalBody" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#323842" />
+      <stop offset="35%" stop-color="#242930" />
+      <stop offset="85%" stop-color="#181c22" />
+      <stop offset="100%" stop-color="#0f1216" />
+    </linearGradient>
+
+    <!-- Top Paper Tray Gradient -->
+    <linearGradient id="pzTopTray" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3c4450" />
+      <stop offset="50%" stop-color="#282e37" />
+      <stop offset="100%" stop-color="#1a1e24" />
+    </linearGradient>
+
+    <!-- Vibrant Electric Blue / Cyan Swoosh Gradient -->
+    <linearGradient id="pzElectricCyan" x1="0%" y1="0%" x2="100%" y2="80%">
+      <stop offset="0%" stop-color="#00c8ff" />
+      <stop offset="30%" stop-color="#009df8" />
+      <stop offset="70%" stop-color="#0080ea" />
+      <stop offset="100%" stop-color="#0062d6" />
+    </linearGradient>
+
+    <!-- Lower Output Tray Block Gradient -->
+    <linearGradient id="pzElectricBase" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#009df8" />
+      <stop offset="50%" stop-color="#007fe8" />
+      <stop offset="100%" stop-color="#005ec4" />
+    </linearGradient>
+
+    <!-- 3D Specular Ridge Gradient -->
+    <linearGradient id="pzSpecularGleam" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.85" />
+      <stop offset="40%" stop-color="#70d8ff" stop-opacity="0.5" />
+      <stop offset="100%" stop-color="#0080ea" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- 3D Text 'Printe' Dark Charcoal Extrusion & Bevel -->
+    <linearGradient id="pzTextCharcoal" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#383f4a" />
+      <stop offset="25%" stop-color="#2a3039" />
+      <stop offset="75%" stop-color="#1c2026" />
+      <stop offset="100%" stop-color="#121519" />
+    </linearGradient>
+
+    <!-- 3D Text 'zyour' Electric Blue Extrusion & Bevel -->
+    <linearGradient id="pzTextBlue" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#29b4ff" />
+      <stop offset="30%" stop-color="#0096f5" />
+      <stop offset="75%" stop-color="#0077dd" />
+      <stop offset="100%" stop-color="#005cb8" />
+    </linearGradient>
+
+    <!-- Soft 3D Drop Shadow for Logo on Light Surfaces -->
+    <filter id="pzShadow" x="-15%" y="-15%" width="130%" height="135%">
+      <feDropShadow dx="1" dy="6" stdDeviation="5.5" flood-color="#0f172a" flood-opacity="0.22" />
+    </filter>
+
+    <!-- Deep Ambient Floor Shadow for Printer Emblem -->
+    <radialGradient id="pzFloorShadow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0f172a" stop-opacity="0.32" />
+      <stop offset="60%" stop-color="#0f172a" stop-opacity="0.12" />
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <!-- ======================================================== -->
+  <!-- 1. PRINTER EMBLEM (LEFT ICON)                           -->
+  <!-- ======================================================== -->
+  <g transform="translate(22, 18)">
+    <!-- Ambient Base Drop Shadow on Floor -->
+    <ellipse cx="118" cy="208" rx="106" ry="14" fill="url(#pzFloorShadow)" />
+
+    <!-- Group with 3D Emboss Shadow -->
+    <g filter="url(#pzShadow)">
+      <!-- Top Paper Feed Tray (3D Beveled Casing) -->
+      <rect x="74" y="36" width="102" height="34" rx="8" fill="url(#pzTopTray)" stroke="#4a5360" stroke-width="1.2" />
+      <!-- Subtle Paper Sheet Inside Tray -->
+      <rect x="86" y="28" width="78" height="12" rx="3" fill="#e2e8f0" opacity="0.95" />
+      <line x1="94" y1="33" x2="156" y2="33" stroke="#cbd5e1" stroke-width="1.5" />
+
+      <!-- Main Printer Chassis Body (Charcoal Matte with Rounded Corners) -->
+      <path d="M 44 68 
+               C 44 62, 50 56, 58 56 
+               L 194 56 
+               C 202 56, 208 62, 208 68 
+               L 208 172 
+               C 208 178, 202 184, 194 184 
+               L 182 184 
+               L 182 196 
+               C 182 201, 177 205, 171 205 
+               L 155 205 
+               C 150 205, 146 201, 146 196 
+               L 146 184 
+               L 44 184 
+               Z" 
+            fill="url(#pzCharcoalBody)" 
+            stroke="#3a424e" 
+            stroke-width="1.5" />
+
+      <!-- Top Specular Highlight Edge along Chassis -->
+      <path d="M 58 58 L 194 58" stroke="#566273" stroke-width="1.8" stroke-linecap="round" />
+
+      <!-- Left Circular Status Indentation / Sensor -->
+      <circle cx="62" cy="98" r="6" fill="#12151a" stroke="#363e4a" stroke-width="1" />
+      <circle cx="62" cy="98" r="2.8" fill="#00d2ff" opacity="0.9" />
+
+      <!-- Internal Paper Output Slot Mouth -->
+      <path d="M 52 136 L 198 136 C 200 136, 202 138, 202 140 L 202 152 C 202 154, 200 156, 198 156 L 52 156 C 50 156, 48 154, 48 152 L 48 140 C 48 138, 50 136, 52 136 Z" 
+            fill="#0b0d10" />
+
+      <!-- Lower Output Tray Block (Glossy Electric Blue Solid 3D Base) -->
+      <rect x="76" y="152" width="108" height="42" rx="9" fill="url(#pzElectricBase)" stroke="#45b8ff" stroke-width="1.2" />
+
+      <!-- Top Specular Edge on Lower Base -->
+      <path d="M 82 154 L 178 154" stroke="#8ae0ff" stroke-width="2" stroke-linecap="round" />
+
+      <!-- DYNAMIC 3D ELECTRIC CYAN/BLUE SWOOSH (Paper Swooping Out and Curling Left) -->
+      <!-- Smooth sweeping curved ribbon with tapered tail -->
+      <path d="M 194 38
+               C 214 62, 218 96, 204 126
+               C 192 152, 164 168, 126 178
+               C 84 188, 42 190, 24 204
+               C 18 208, 15 214, 18 220
+               C 20 223, 25 224, 30 221
+               C 56 206, 92 195, 134 184
+               C 176 174, 214 150, 226 112
+               C 234 84, 228 54, 194 38 Z"
+            fill="url(#pzElectricCyan)" />
+
+      <!-- High-Gloss Specular Highlight Curve Along Upper Swoosh Ridge -->
+      <path d="M 192 46
+               C 210 68, 215 98, 202 124
+               C 188 150, 158 168, 118 178
+               C 78 188, 44 196, 26 208"
+            fill="none"
+            stroke="url(#pzSpecularGleam)"
+            stroke-width="3.2"
+            stroke-linecap="round" />
+    </g>
+  </g>
+
+  <!-- ======================================================== -->
+  <!-- 2. WORDMARK: "Printezyour" (3D Molded Typography)       -->
+  <!-- ======================================================== -->
+  <g transform="translate(245, 148)" filter="url(#pzShadow)">
+    <style>
+      .pz-brand-title {
+        font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+        font-weight: 800;
+        font-size: 104px;
+        letter-spacing: -2.5px;
+      }
+      .pz-brand-tagline {
+        font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+        font-weight: 600;
+        font-size: 38px;
+        letter-spacing: 0.8px;
+      }
+    </style>
+
+    <!-- Main Wordmark -->
+    <text class="pz-brand-title" y="0">
+      <!-- 'Printe' in Dark 3D Charcoal with Bevel Stroke -->
+      <tspan fill="url(#pzTextCharcoal)" stroke="#424b58" stroke-width="1.2" paint-order="stroke fill">Printe</tspan>
+      <!-- 'zyour' in Vibrant Electric Blue with Specular Top Bevel -->
+      <tspan fill="url(#pzTextBlue)" stroke="#66c9ff" stroke-width="1.2" paint-order="stroke fill">zyour</tspan>
+    </text>
+
+    <!-- Subtitle Tagline: "Your imagination, our print" -->
+    <text class="pz-brand-tagline" x="4" y="58" fill="#2d333b">
+      Your imagination, our print
+    </text>
+  </g>
+</svg>
