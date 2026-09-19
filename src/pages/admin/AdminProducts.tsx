@@ -640,7 +640,8 @@ export const AdminProducts: React.FC<AdminProductsProps> = ({
               <tbody className="divide-y divide-slate-100">
                 {(filteredProducts || []).map(product => {
                   const stock = productStockMap.get(product.id)!;
-                  const imgUrl = (product.images && product.images[0]) || product.image || '';
+                  const rawImg = (product.images && product.images[0]) || product.image;
+                  const imgUrl = (typeof rawImg === 'string' && rawImg.trim()) ? rawImg.trim() : null;
                   const optionsCount = (product.options || product.optionGroups || []).length;
                   const bomCount = (product.materialRequirements || []).length;
 
@@ -862,7 +863,8 @@ export const AdminProducts: React.FC<AdminProductsProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {(filteredProducts || []).map(product => {
             const stock = productStockMap.get(product.id)!;
-            const imgUrl = (product.images && product.images[0]) || product.image || '';
+            const rawImg = (product.images && product.images[0]) || product.image;
+            const imgUrl = (typeof rawImg === 'string' && rawImg.trim()) ? rawImg.trim() : null;
 
             return (
               <div

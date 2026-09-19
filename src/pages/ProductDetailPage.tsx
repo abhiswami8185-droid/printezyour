@@ -74,7 +74,12 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   const [selectedOptions, setSelectedOptions] = useState<{ [groupName: string]: { value: string; priceModifier: number } }>({});
 
   // Active Image Preview
-  const [selectedImage, setSelectedImage] = useState<string>('');
+  const [selectedImage, setSelectedImage] = useState<string>(() => {
+    if (initialProduct) {
+      return (initialProduct.images && initialProduct.images[0]) || initialProduct.image || '/images/products/visiting-cards-matte.jpg';
+    }
+    return '/images/products/visiting-cards-matte.jpg';
+  });
 
   useEffect(() => {
     if (!product) return;
@@ -94,7 +99,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
       }
     });
     setSelectedOptions(initialOpts);
-    setSelectedImage((product.images && product.images[0]) || product.image || '');
+    setSelectedImage((product.images && product.images[0]) || product.image || '/images/products/visiting-cards-matte.jpg');
   }, [product]);
 
   // Custom design notes
@@ -287,9 +292,15 @@ Please confirm order and delivery schedule.`;
           {/* Main Hero Image */}
           <div className="aspect-4/3 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 relative group shadow-xs">
             <img
-              src={selectedImage}
+              src={selectedImage || (product.images && product.images[0]) || product.image || '/images/products/visiting-cards-matte.jpg'}
               alt={product.name}
               className="w-full h-full object-cover"
+              onError={(e) => {
+                const target = e.currentTarget;
+                if (!target.src.includes('/images/products/visiting-cards-matte.jpg')) {
+                  target.src = '/images/products/visiting-cards-matte.jpg';
+                }
+              }}
             />
             <span className="absolute top-3 left-3 bg-white/95 backdrop-blur-xs text-slate-800 text-xs font-bold px-3 py-1 rounded-full shadow-xs">
               {product.category}
@@ -297,9 +308,9 @@ Please confirm order and delivery schedule.`;
           </div>
 
           {/* Thumbnail Gallery */}
-          {(product.images || []).length > 1 && (
+          {(product.images || []).filter(img => Boolean(img && img.trim())).length > 1 && (
             <div className="flex items-center gap-3 overflow-x-auto pb-1">
-              {(product.images || []).map((img, idx) => (
+              {(product.images || []).filter(img => Boolean(img && img.trim())).map((img, idx) => (
                 <button
                   key={idx}
                   onClick={() => setSelectedImage(img)}

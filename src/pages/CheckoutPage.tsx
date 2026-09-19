@@ -360,9 +360,15 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onOrderSuccess, onNa
             {(items || []).map(item => (
               <div key={item.id} className="flex items-center gap-3 text-xs border-b border-slate-100 pb-3">
                 <img
-                  src={item.image}
+                  src={(item.image && item.image.trim()) || '/images/products/visiting-cards-matte.jpg'}
                   alt={item.productName}
                   className="w-12 h-12 rounded-lg object-cover bg-slate-100 border shrink-0"
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    if (!target.src.includes('/images/products/visiting-cards-matte.jpg')) {
+                      target.src = '/images/products/visiting-cards-matte.jpg';
+                    }
+                  }}
                 />
                 <div className="flex-1 min-w-0">
                   <h5 className="font-semibold text-slate-900 truncate">{item.productName}</h5>

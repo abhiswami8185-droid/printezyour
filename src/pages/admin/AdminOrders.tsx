@@ -293,9 +293,15 @@ export const AdminOrders: React.FC<AdminOrdersProps> = ({ orders = [], onOrderUp
                 {(activeOrder.items || []).map(item => (
                   <div key={item.id} className="p-4 flex items-start gap-4">
                     <img
-                      src={item.image}
+                      src={(item.image && item.image.trim()) || '/images/products/visiting-cards-matte.jpg'}
                       alt={item.productName}
                       className="w-14 h-14 rounded-lg object-cover bg-slate-100 border shrink-0"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        if (!target.src.includes('/images/products/visiting-cards-matte.jpg')) {
+                          target.src = '/images/products/visiting-cards-matte.jpg';
+                        }
+                      }}
                     />
                     <div className="flex-1 min-w-0">
                       <div className="font-bold text-slate-900">{item.productName}</div>

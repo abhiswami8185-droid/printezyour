@@ -118,9 +118,15 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ onCheckout, onContinueSh
                 >
                   <div className="flex items-start gap-3">
                     <img
-                      src={item.image}
+                      src={(item.image && item.image.trim()) || '/images/products/visiting-cards-matte.jpg'}
                       alt={item.productName}
                       className="w-14 h-14 rounded-lg object-cover bg-slate-100 shrink-0 border border-slate-200"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        if (!target.src.includes('/images/products/visiting-cards-matte.jpg')) {
+                          target.src = '/images/products/visiting-cards-matte.jpg';
+                        }
+                      }}
                     />
                     <div className="flex-1 min-w-0">
                       <h5 className="font-semibold text-xs text-slate-900 truncate">

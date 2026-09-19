@@ -466,9 +466,9 @@ export const ImageManagementModal: React.FC<ImageManagementModalProps> = ({
                   aspectRatio === '1:1' ? 'aspect-square' : aspectRatio === '16:9' ? 'aspect-video' : 'aspect-4/3'
                 }`}
               >
-                {previewUrl ? (
+                {previewUrl && typeof previewUrl === 'string' && previewUrl.trim().length > 0 ? (
                   <img
-                    src={previewUrl}
+                    src={previewUrl.trim()}
                     alt="Preview"
                     className={`w-full h-full transition-transform duration-200 ${
                       fitMode === 'cover' ? 'object-cover' : 'object-contain'

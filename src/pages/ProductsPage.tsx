@@ -271,9 +271,15 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({
                   {/* Image */}
                   <div className="relative aspect-4/3 bg-slate-100 overflow-hidden">
                     <img
-                      src={(product.images && product.images[0]) || product.image || ''}
+                      src={(product.images && product.images[0]) || product.image || '/images/products/visiting-cards-matte.jpg'}
                       alt={product.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        if (!target.src.includes('/images/products/visiting-cards-matte.jpg')) {
+                          target.src = '/images/products/visiting-cards-matte.jpg';
+                        }
+                      }}
                     />
                     <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-xs text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded-md shadow-xs">
                       {product.category}

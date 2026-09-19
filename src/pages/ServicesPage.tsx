@@ -97,7 +97,7 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({ services = [], onNav
       {/* Services Grid (All 20 Services) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredServices.map(srv => {
-          const serviceImage = srv.image || srv.imageUrl || '/images/services/visiting-cards.jpg';
+          const serviceImage = (srv.image && srv.image.trim()) || (srv.imageUrl && srv.imageUrl.trim()) || '/images/services/visiting-cards.jpg';
           const serviceMaterials = srv.materials || srv.materialsAvailable || [];
           const serviceFeatures = srv.features || [];
           const turnaround = srv.turnaroundTime || srv.typicalTurnaround || '24-48 Hours';

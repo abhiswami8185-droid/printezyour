@@ -222,7 +222,7 @@ export const AdminServicesTab: React.FC<AdminServicesTabProps> = ({
         /* GRID CARDS VIEW */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredServices.map(service => {
-            const imgUrl = service.image || service.imageUrl || '/images/services/visiting-cards.jpg';
+            const imgUrl = (service.image && service.image.trim()) || (service.imageUrl && service.imageUrl.trim()) || '/images/services/visiting-cards.jpg';
             const turnaround = service.turnaroundTime || (service as any).typicalTurnaround || '24-48 Hours';
 
             return (
@@ -356,7 +356,7 @@ export const AdminServicesTab: React.FC<AdminServicesTabProps> = ({
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {filteredServices.map(service => {
-                  const imgUrl = service.image || service.imageUrl || '/images/services/visiting-cards.jpg';
+                  const imgUrl = (service.image && service.image.trim()) || (service.imageUrl && service.imageUrl.trim()) || '/images/services/visiting-cards.jpg';
                   const turnaround = service.turnaroundTime || (service as any).typicalTurnaround || '24-48 Hours';
 
                   return (

@@ -478,13 +478,13 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
-                  {(formData.images || []).map((img, idx) => (
+                  {(formData.images || []).filter(img => typeof img === 'string' && img.trim().length > 0).map((img, idx) => (
                     <div
                       key={idx}
                       className="relative w-20 h-20 rounded-xl border border-slate-300 overflow-hidden bg-white group shadow-2xs"
                     >
                       <img
-                        src={img}
+                        src={img.trim()}
                         alt="Product Preview"
                         className="w-full h-full object-cover"
                         referrerPolicy="no-referrer"

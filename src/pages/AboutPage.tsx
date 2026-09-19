@@ -64,6 +64,12 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             alt="Commercial printing press machinery"
             className="w-full h-full object-cover"
             referrerPolicy="no-referrer"
+            onError={(e) => {
+              const target = e.currentTarget;
+              if (!target.src.includes('/images/services/pamphlets-flyers.jpg')) {
+                target.src = '/images/services/pamphlets-flyers.jpg';
+              }
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-6">
             <span className="text-white text-xs font-semibold">
