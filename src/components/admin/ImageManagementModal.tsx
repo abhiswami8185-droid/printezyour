@@ -17,6 +17,7 @@ import {
 import { Product, ServiceItem } from '../../types';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import { getAssetUrl } from '../../utils/assets';
 
 export interface ImageManagementModalProps {
   isOpen: boolean;
@@ -373,7 +374,7 @@ export const ImageManagementModal: React.FC<ImageManagementModalProps> = ({
                         }`}
                       >
                         <img
-                          src={sample.url}
+                          src={getAssetUrl(sample.url)}
                           alt={sample.label}
                           className="w-10 h-10 rounded-lg object-cover bg-slate-100 shrink-0"
                           referrerPolicy="no-referrer"
@@ -468,7 +469,7 @@ export const ImageManagementModal: React.FC<ImageManagementModalProps> = ({
               >
                 {previewUrl && typeof previewUrl === 'string' && previewUrl.trim().length > 0 ? (
                   <img
-                    src={previewUrl.trim()}
+                    src={getAssetUrl(previewUrl.trim())}
                     alt="Preview"
                     className={`w-full h-full transition-transform duration-200 ${
                       fitMode === 'cover' ? 'object-cover' : 'object-contain'

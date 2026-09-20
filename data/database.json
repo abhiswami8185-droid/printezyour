@@ -2372,6 +2372,18 @@
   ],
   "auditLogs": [
     {
+      "id": "log-1789916212597-49cq",
+      "timestamp": "2026-09-20T14:56:52.597Z",
+      "user": "Abhi Swami (Owner / Director)",
+      "role": "SUPER_ADMIN",
+      "action": "LOGIN",
+      "details": "Authenticated to administrative console from 127.0.0.1",
+      "userId": "usr-1",
+      "targetType": "User",
+      "targetId": "usr-1",
+      "ip": "127.0.0.1"
+    },
+    {
       "id": "log-1789812147366-17ic",
       "timestamp": "2026-09-19T10:02:27.366Z",
       "user": "Raman Preet",

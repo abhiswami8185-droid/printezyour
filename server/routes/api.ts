@@ -747,8 +747,23 @@ apiRouter.get('/reports/dashboard', requirePermission('reports.view'), (_req, re
 // SETTINGS
 // ----------------------------------------------------
 
-apiRouter.get('/settings', (_req, res) => {
-  res.json(db.getSettings());
+apiRouter.get('/settings', (req: AuthenticatedRequest, res) => {
+  const settings = db.getSettings();
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.startsWith('Bearer ')
+    ? authHeader.slice(7).trim()
+    : (req.headers['x-admin-token'] as string | undefined)?.trim();
+  const userId = token ? validateSessionToken(token) : null;
+  const user = userId ? db.getUserById(userId) : null;
+  const isAuthenticatedAdmin = user && user.active;
+
+  if (isAuthenticatedAdmin) {
+    res.json(settings);
+  } else {
+    // Sanitize sensitive credentials from public storefront
+    const { whatsappApiKey: _, ...publicSettings } = settings;
+    res.json(publicSettings);
+  }
 });
 
 apiRouter.put('/settings', requirePermission('settings.edit'), (req: AuthenticatedRequest, res) => {

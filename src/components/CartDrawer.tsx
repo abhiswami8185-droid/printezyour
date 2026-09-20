@@ -11,6 +11,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { getAssetUrl } from '../utils/assets';
 
 interface CartDrawerProps {
   onCheckout: () => void;
@@ -118,13 +119,14 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ onCheckout, onContinueSh
                 >
                   <div className="flex items-start gap-3">
                     <img
-                      src={(item.image && item.image.trim()) || '/images/products/visiting-cards-matte.jpg'}
+                      src={getAssetUrl((item.image && item.image.trim()) || '/images/products/visiting-cards-matte.jpg')}
                       alt={item.productName}
                       className="w-14 h-14 rounded-lg object-cover bg-slate-100 shrink-0 border border-slate-200"
                       onError={(e) => {
                         const target = e.currentTarget;
-                        if (!target.src.includes('/images/products/visiting-cards-matte.jpg')) {
-                          target.src = '/images/products/visiting-cards-matte.jpg';
+                        const fallback = getAssetUrl('/images/products/visiting-cards-matte.jpg');
+                        if (target.src !== fallback) {
+                          target.src = fallback;
                         }
                       }}
                     />

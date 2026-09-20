@@ -18,6 +18,7 @@ import { Product, SelectedOption, InventoryItem } from '../types';
 import { useCart } from '../context/CartContext';
 import { api } from '../services/api';
 import { calculateProductStock } from '../utils/stockCalculation';
+import { getAssetUrl } from '../utils/assets';
 
 interface ProductDetailPageProps {
   product?: Product;
@@ -292,13 +293,14 @@ Please confirm order and delivery schedule.`;
           {/* Main Hero Image */}
           <div className="aspect-4/3 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 relative group shadow-xs">
             <img
-              src={selectedImage || (product.images && product.images[0]) || product.image || '/images/products/visiting-cards-matte.jpg'}
+              src={getAssetUrl(selectedImage || (product.images && product.images[0]) || product.image || '/images/products/visiting-cards-matte.jpg')}
               alt={product.name}
               className="w-full h-full object-cover"
               onError={(e) => {
                 const target = e.currentTarget;
-                if (!target.src.includes('/images/products/visiting-cards-matte.jpg')) {
-                  target.src = '/images/products/visiting-cards-matte.jpg';
+                const fallback = getAssetUrl('/images/products/visiting-cards-matte.jpg');
+                if (target.src !== fallback) {
+                  target.src = fallback;
                 }
               }}
             />
@@ -320,7 +322,7 @@ Please confirm order and delivery schedule.`;
                       : 'border-slate-200 opacity-70 hover:opacity-100'
                   }`}
                 >
-                  <img src={img} alt="Product view" className="w-full h-full object-cover" />
+                  <img src={getAssetUrl(img)} alt="Product view" className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>

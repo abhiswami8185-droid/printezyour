@@ -15,6 +15,7 @@ import {
   PermissionKey,
   AuditLog
 } from '../types';
+import { getPublicSiteUrl, getAdminSiteUrl } from '../config/site';
 
 let currentAuthToken: string = '';
 try {
@@ -48,10 +49,27 @@ const getHeaders = (_role?: UserRole): HeadersInit => {
   return headers;
 };
 
+/**
+ * Resolves the backend API URL.
+ * If VITE_API_URL is configured (e.g. 'https://api.printezyour.com' when frontend is on GitHub Pages/Vercel),
+ * it prepends the backend base URL.
+ * Otherwise, uses the standard relative path '/api/...' (when running full-stack or on Node.js hosting).
+ */
+export const getApiUrl = (endpoint: string): string => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  const base = (envUrl && typeof envUrl === 'string') ? envUrl.trim().replace(/\/+$/, '') : '';
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : ('/' + endpoint);
+  return base ? (base + cleanEndpoint) : cleanEndpoint;
+};
+
+const apiFetch = (url: string, init?: RequestInit): Promise<Response> => {
+  return fetch(getApiUrl(url), init);
+};
+
 export const api = {
   // --- Auth ---
   async login(email: string, password?: string) {
-    const res = await fetch('/api/auth/login', {
+    const res = await apiFetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
@@ -69,7 +87,7 @@ export const api = {
 
   async logout() {
     try {
-      await fetch('/api/auth/logout', {
+      await apiFetch('/api/auth/logout', {
         method: 'POST',
         headers: getHeaders()
       });
@@ -79,7 +97,7 @@ export const api = {
   },
 
   async getMe(): Promise<{ user: User }> {
-    const res = await fetch('/api/auth/me', {
+    const res = await apiFetch('/api/auth/me', {
       headers: getHeaders()
     });
     if (!res.ok) throw new Error('Session expired');
@@ -87,7 +105,7 @@ export const api = {
   },
 
   async changePassword(currentPassword: string, newPassword: string): Promise<{ success: boolean; message: string }> {
-    const res = await fetch('/api/auth/change-password', {
+    const res = await apiFetch('/api/auth/change-password', {
       method: 'POST',
       headers: getHeaders(),
       body: JSON.stringify({ currentPassword, newPassword })
@@ -101,7 +119,7 @@ export const api = {
 
   // --- Users Access Management ---
   async getUsers(): Promise<User[]> {
-    const res = await fetch('/api/users', {
+    const res = await apiFetch('/api/users', {
       headers: getHeaders()
     });
     if (!res.ok) {
@@ -112,7 +130,7 @@ export const api = {
   },
 
   async createUser(userData: any): Promise<User> {
-    const res = await fetch('/api/users', {
+    const res = await apiFetch('/api/users', {
       method: 'POST',
       headers: getHeaders(),
       body: JSON.stringify(userData)
@@ -125,7 +143,7 @@ export const api = {
   },
 
   async updateUser(id: string, updates: any): Promise<User> {
-    const res = await fetch(`/api/users/${id}`, {
+    const res = await apiFetch(`/api/users/${id}`, {
       method: 'PUT',
       headers: getHeaders(),
       body: JSON.stringify(updates)
@@ -138,7 +156,7 @@ export const api = {
   },
 
   async setUserPermissions(id: string, grantedPermissions: PermissionKey[], revokedPermissions: PermissionKey[]): Promise<User> {
-    const res = await fetch(`/api/users/${id}/permissions`, {
+    const res = await apiFetch(`/api/users/${id}/permissions`, {
       method: 'PUT',
       headers: getHeaders(),
       body: JSON.stringify({ grantedPermissions, revokedPermissions })
@@ -151,7 +169,7 @@ export const api = {
   },
 
   async setUserStatus(id: string, active: boolean): Promise<{ success: boolean; message: string; user?: User }> {
-    const res = await fetch(`/api/users/${id}/status`, {
+    const res = await apiFetch(`/api/users/${id}/status`, {
       method: 'PUT',
       headers: getHeaders(),
       body: JSON.stringify({ active })
@@ -164,7 +182,7 @@ export const api = {
   },
 
   async resetUserPassword(id: string, newPassword: string): Promise<{ success: boolean; message: string }> {
-    const res = await fetch(`/api/users/${id}/reset-password`, {
+    const res = await apiFetch(`/api/users/${id}/reset-password`, {
       method: 'POST',
       headers: getHeaders(),
       body: JSON.stringify({ newPassword })
@@ -177,7 +195,7 @@ export const api = {
   },
 
   async deleteUser(id: string): Promise<{ success: boolean; message: string }> {
-    const res = await fetch(`/api/users/${id}`, {
+    const res = await apiFetch(`/api/users/${id}`, {
       method: 'DELETE',
       headers: getHeaders()
     });
@@ -190,7 +208,7 @@ export const api = {
 
   // --- Roles & Permissions Management ---
   async getRoles(): Promise<RoleDefinition[]> {
-    const res = await fetch('/api/roles', {
+    const res = await apiFetch('/api/roles', {
       headers: getHeaders()
     });
     if (!res.ok) {
@@ -201,13 +219,13 @@ export const api = {
   },
 
   async getPermissions(): Promise<PermissionKey[]> {
-    const res = await fetch('/api/permissions');
+    const res = await apiFetch('/api/permissions');
     if (!res.ok) throw new Error('Failed to fetch permissions');
     return res.json();
   },
 
   async createRole(roleData: { name: string; description: string; permissions: PermissionKey[] }): Promise<RoleDefinition> {
-    const res = await fetch('/api/roles', {
+    const res = await apiFetch('/api/roles', {
       method: 'POST',
       headers: getHeaders(),
       body: JSON.stringify(roleData)
@@ -220,7 +238,7 @@ export const api = {
   },
 
   async updateRole(id: string, roleData: { name?: string; description?: string; permissions?: PermissionKey[] }): Promise<RoleDefinition> {
-    const res = await fetch(`/api/roles/${id}`, {
+    const res = await apiFetch(`/api/roles/${id}`, {
       method: 'PUT',
       headers: getHeaders(),
       body: JSON.stringify(roleData)
@@ -233,7 +251,7 @@ export const api = {
   },
 
   async deleteRole(id: string): Promise<{ success: boolean; message: string }> {
-    const res = await fetch(`/api/roles/${id}`, {
+    const res = await apiFetch(`/api/roles/${id}`, {
       method: 'DELETE',
       headers: getHeaders()
     });
@@ -246,7 +264,7 @@ export const api = {
 
   // --- Audit Logs ---
   async getAuditLogs(): Promise<AuditLog[]> {
-    const res = await fetch('/api/audit-logs', {
+    const res = await apiFetch('/api/audit-logs', {
       headers: getHeaders()
     });
     if (!res.ok) {
@@ -258,13 +276,13 @@ export const api = {
 
   // --- Categories ---
   async getCategories(): Promise<Category[]> {
-    const res = await fetch('/api/categories');
+    const res = await apiFetch('/api/categories');
     if (!res.ok) throw new Error('Failed to fetch categories');
     return res.json();
   },
 
   async createCategory(cat: Omit<Category, 'id'>, role?: UserRole): Promise<Category> {
-    const res = await fetch('/api/categories', {
+    const res = await apiFetch('/api/categories', {
       method: 'POST',
       headers: getHeaders(role),
       body: JSON.stringify(cat)
@@ -273,7 +291,7 @@ export const api = {
   },
 
   async updateCategory(id: string, updates: Partial<Category>, role?: UserRole): Promise<Category> {
-    const res = await fetch(`/api/categories/${id}`, {
+    const res = await apiFetch(`/api/categories/${id}`, {
       method: 'PUT',
       headers: getHeaders(role),
       body: JSON.stringify(updates)
@@ -282,7 +300,7 @@ export const api = {
   },
 
   async deleteCategory(id: string, role?: UserRole): Promise<{ success: boolean }> {
-    const res = await fetch(`/api/categories/${id}`, {
+    const res = await apiFetch(`/api/categories/${id}`, {
       method: 'DELETE',
       headers: getHeaders(role)
     });
@@ -291,19 +309,19 @@ export const api = {
 
   // --- Services ---
   async getServices(): Promise<ServiceItem[]> {
-    const res = await fetch('/api/services');
+    const res = await apiFetch('/api/services');
     if (!res.ok) throw new Error('Failed to fetch services');
     return res.json();
   },
 
   async getService(slug: string): Promise<ServiceItem> {
-    const res = await fetch(`/api/services/${slug}`);
+    const res = await apiFetch(`/api/services/${slug}`);
     if (!res.ok) throw new Error('Service not found');
     return res.json();
   },
 
   async createService(srv: Omit<ServiceItem, 'id'>, role?: UserRole): Promise<ServiceItem> {
-    const res = await fetch('/api/services', {
+    const res = await apiFetch('/api/services', {
       method: 'POST',
       headers: getHeaders(role),
       body: JSON.stringify(srv)
@@ -312,7 +330,7 @@ export const api = {
   },
 
   async updateService(id: string, updates: Partial<ServiceItem>, role?: UserRole): Promise<ServiceItem> {
-    const res = await fetch(`/api/services/${id}`, {
+    const res = await apiFetch(`/api/services/${id}`, {
       method: 'PUT',
       headers: getHeaders(role),
       body: JSON.stringify(updates)
@@ -321,7 +339,7 @@ export const api = {
   },
 
   async updateServiceImage(id: string, imageUrl: string, role?: UserRole): Promise<ServiceItem> {
-    const res = await fetch(`/api/services/${id}/image`, {
+    const res = await apiFetch(`/api/services/${id}/image`, {
       method: 'PUT',
       headers: getHeaders(role),
       body: JSON.stringify({ imageUrl })
@@ -336,19 +354,19 @@ export const api = {
   // --- Products ---
   async getProducts(category?: string): Promise<Product[]> {
     const url = category ? `/api/products?category=${encodeURIComponent(category)}` : '/api/products';
-    const res = await fetch(url);
+    const res = await apiFetch(url);
     if (!res.ok) throw new Error('Failed to fetch products');
     return res.json();
   },
 
   async getProduct(slugOrId: string): Promise<Product> {
-    const res = await fetch(`/api/products/${slugOrId}`);
+    const res = await apiFetch(`/api/products/${slugOrId}`);
     if (!res.ok) throw new Error('Product not found');
     return res.json();
   },
 
   async createProduct(prod: Omit<Product, 'id'>, role?: UserRole): Promise<Product> {
-    const res = await fetch('/api/products', {
+    const res = await apiFetch('/api/products', {
       method: 'POST',
       headers: getHeaders(role),
       body: JSON.stringify(prod)
@@ -357,7 +375,7 @@ export const api = {
   },
 
   async updateProduct(id: string, updates: Partial<Product>, role?: UserRole): Promise<Product> {
-    const res = await fetch(`/api/products/${id}`, {
+    const res = await apiFetch(`/api/products/${id}`, {
       method: 'PUT',
       headers: getHeaders(role),
       body: JSON.stringify(updates)
@@ -366,7 +384,7 @@ export const api = {
   },
 
   async updateProductImage(id: string, imageUrl: string, role?: UserRole): Promise<Product> {
-    const res = await fetch(`/api/products/${id}/image`, {
+    const res = await apiFetch(`/api/products/${id}/image`, {
       method: 'PUT',
       headers: getHeaders(role),
       body: JSON.stringify({ imageUrl })
@@ -379,7 +397,7 @@ export const api = {
   },
 
   async deleteProduct(id: string, role?: UserRole): Promise<{ success: boolean; archived?: boolean; message?: string }> {
-    const res = await fetch(`/api/products/${id}`, {
+    const res = await apiFetch(`/api/products/${id}`, {
       method: 'DELETE',
       headers: getHeaders(role)
     });
@@ -388,20 +406,20 @@ export const api = {
 
   // --- Orders ---
   async getOrders(role?: UserRole): Promise<Order[]> {
-    const res = await fetch('/api/orders', { headers: getHeaders(role) });
+    const res = await apiFetch('/api/orders', { headers: getHeaders(role) });
     if (!res.ok) throw new Error('Failed to load orders');
     const data = await res.json();
     return Array.isArray(data) ? data : [];
   },
 
   async getOrder(id: string): Promise<Order> {
-    const res = await fetch(`/api/orders/${id}`);
+    const res = await apiFetch(`/api/orders/${id}`);
     if (!res.ok) throw new Error('Order not found');
     return res.json();
   },
 
   async trackOrder(orderId: string, phone?: string): Promise<Order> {
-    const res = await fetch('/api/orders/track', {
+    const res = await apiFetch('/api/orders/track', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ orderId, phone })
@@ -414,7 +432,7 @@ export const api = {
   },
 
   async createOrder(orderData: any): Promise<{ order: Order; whatsapp: any }> {
-    const res = await fetch('/api/orders', {
+    const res = await apiFetch('/api/orders', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(orderData)
@@ -433,7 +451,7 @@ export const api = {
     updatedBy?: string,
     role?: UserRole
   ): Promise<Order> {
-    const res = await fetch(`/api/orders/${orderId}/status`, {
+    const res = await apiFetch(`/api/orders/${orderId}/status`, {
       method: 'PUT',
       headers: getHeaders(role),
       body: JSON.stringify({ status, notes, updatedBy })
@@ -446,7 +464,7 @@ export const api = {
     paymentStatus: Order['paymentStatus'],
     role?: UserRole
   ): Promise<Order> {
-    const res = await fetch(`/api/orders/${orderId}/payment`, {
+    const res = await apiFetch(`/api/orders/${orderId}/payment`, {
       method: 'PUT',
       headers: getHeaders(role),
       body: JSON.stringify({ paymentStatus })
@@ -456,14 +474,14 @@ export const api = {
 
   // --- Quotes ---
   async getQuotes(role?: UserRole): Promise<QuoteRequest[]> {
-    const res = await fetch('/api/quotes', { headers: getHeaders(role) });
+    const res = await apiFetch('/api/quotes', { headers: getHeaders(role) });
     if (!res.ok) throw new Error('Failed to load quotes');
     const data = await res.json();
     return Array.isArray(data) ? data : [];
   },
 
   async submitQuote(quoteData: any): Promise<QuoteRequest> {
-    const res = await fetch('/api/quotes', {
+    const res = await apiFetch('/api/quotes', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(quoteData)
@@ -472,7 +490,7 @@ export const api = {
   },
 
   async updateQuote(id: string, updates: Partial<QuoteRequest>, role?: UserRole): Promise<QuoteRequest> {
-    const res = await fetch(`/api/quotes/${id}`, {
+    const res = await apiFetch(`/api/quotes/${id}`, {
       method: 'PUT',
       headers: getHeaders(role),
       body: JSON.stringify(updates)
@@ -481,7 +499,7 @@ export const api = {
   },
 
   async convertQuoteToOrder(id: string, finalPrice: number, role?: UserRole): Promise<Order> {
-    const res = await fetch(`/api/quotes/${id}/convert`, {
+    const res = await apiFetch(`/api/quotes/${id}/convert`, {
       method: 'POST',
       headers: getHeaders(role),
       body: JSON.stringify({ finalPrice })
@@ -491,7 +509,7 @@ export const api = {
 
   // --- Inventory ---
   async getInventory(role?: UserRole): Promise<InventoryItem[]> {
-    const res = await fetch('/api/inventory', { headers: getHeaders(role) });
+    const res = await apiFetch('/api/inventory', { headers: getHeaders(role) });
     if (!res.ok) throw new Error('Failed to load inventory');
     const data = await res.json();
     return Array.isArray(data) ? data : [];
@@ -506,7 +524,7 @@ export const api = {
     referenceId?: string,
     role?: UserRole
   ): Promise<InventoryItem> {
-    const res = await fetch('/api/inventory/adjust', {
+    const res = await apiFetch('/api/inventory/adjust', {
       method: 'POST',
       headers: getHeaders(role),
       body: JSON.stringify({ itemId, quantityDelta, type, reason, recordedBy, referenceId })
@@ -515,7 +533,7 @@ export const api = {
   },
 
   async createInventoryItem(item: Omit<InventoryItem, 'id' | 'updatedAt'>, role?: UserRole): Promise<InventoryItem> {
-    const res = await fetch('/api/inventory', {
+    const res = await apiFetch('/api/inventory', {
       method: 'POST',
       headers: getHeaders(role),
       body: JSON.stringify(item)
@@ -525,14 +543,14 @@ export const api = {
 
   // --- Suppliers & Purchases ---
   async getSuppliers(role?: UserRole): Promise<Supplier[]> {
-    const res = await fetch('/api/suppliers', { headers: getHeaders(role) });
+    const res = await apiFetch('/api/suppliers', { headers: getHeaders(role) });
     if (!res.ok) throw new Error('Failed to load suppliers');
     const data = await res.json();
     return Array.isArray(data) ? data : [];
   },
 
   async createSupplier(sup: Omit<Supplier, 'id'>, role?: UserRole): Promise<Supplier> {
-    const res = await fetch('/api/suppliers', {
+    const res = await apiFetch('/api/suppliers', {
       method: 'POST',
       headers: getHeaders(role),
       body: JSON.stringify(sup)
@@ -541,14 +559,14 @@ export const api = {
   },
 
   async getPurchases(role?: UserRole): Promise<Purchase[]> {
-    const res = await fetch('/api/purchases', { headers: getHeaders(role) });
+    const res = await apiFetch('/api/purchases', { headers: getHeaders(role) });
     if (!res.ok) throw new Error('Failed to load purchases');
     const data = await res.json();
     return Array.isArray(data) ? data : [];
   },
 
   async createPurchase(purchase: Omit<Purchase, 'id'>, role?: UserRole): Promise<Purchase> {
-    const res = await fetch('/api/purchases', {
+    const res = await apiFetch('/api/purchases', {
       method: 'POST',
       headers: getHeaders(role),
       body: JSON.stringify(purchase)
@@ -557,7 +575,7 @@ export const api = {
   },
 
   async receivePurchase(id: string, recordedBy: string, role?: UserRole): Promise<Purchase> {
-    const res = await fetch(`/api/purchases/${id}/receive`, {
+    const res = await apiFetch(`/api/purchases/${id}/receive`, {
       method: 'PUT',
       headers: getHeaders(role),
       body: JSON.stringify({ recordedBy })
@@ -567,7 +585,7 @@ export const api = {
 
   // --- Customers ---
   async getCustomers(role?: UserRole): Promise<Customer[]> {
-    const res = await fetch('/api/customers', { headers: getHeaders(role) });
+    const res = await apiFetch('/api/customers', { headers: getHeaders(role) });
     if (!res.ok) throw new Error('Failed to load customers');
     const data = await res.json();
     return Array.isArray(data) ? data : [];
@@ -575,19 +593,19 @@ export const api = {
 
   // --- Dashboard Metrics ---
   async getDashboardMetrics(role?: UserRole) {
-    const res = await fetch('/api/reports/dashboard', { headers: getHeaders(role) });
+    const res = await apiFetch('/api/reports/dashboard', { headers: getHeaders(role) });
     if (!res.ok) throw new Error('Failed to load dashboard metrics');
     return res.json();
   },
 
   // --- Settings ---
   async getSettings(): Promise<BusinessSettings> {
-    const res = await fetch('/api/settings');
+    const res = await apiFetch('/api/settings');
     return res.json();
   },
 
   async updateSettings(settings: Partial<BusinessSettings>, role?: UserRole): Promise<BusinessSettings> {
-    const res = await fetch('/api/settings', {
+    const res = await apiFetch('/api/settings', {
       method: 'PUT',
       headers: getHeaders(role),
       body: JSON.stringify(settings)
@@ -669,7 +687,7 @@ export const api = {
   }> {
     const formData = new FormData();
     formData.append('artwork', file);
-    const res = await fetch('/api/upload', {
+    const res = await apiFetch('/api/upload', {
       method: 'POST',
       body: formData
     });
@@ -678,7 +696,10 @@ export const api = {
       throw new Error(err.error || 'File upload failed');
     }
     const data = await res.json();
-    return data.file;
+    return {
+      ...data.file,
+      url: getApiUrl(data.file.url)
+    };
   },
 
   // --- Environment & Site Configuration ---
@@ -689,16 +710,16 @@ export const api = {
     isCustomDomainConfigured: boolean;
   }> {
     try {
-      const res = await fetch('/api/config');
+      const res = await apiFetch('/api/config');
       if (!res.ok) {
         throw new Error('Failed to fetch site config');
       }
       return await res.json();
     } catch {
-      // Return safe defaults in case of transient failure
+      // Return safe defaults using site configuration helpers in case of transient failure
       return {
-        publicSiteUrl: window.location?.origin || 'http://localhost:3000',
-        adminSiteUrl: `${window.location?.origin || 'http://localhost:3000'}/#/admin`,
+        publicSiteUrl: getPublicSiteUrl(),
+        adminSiteUrl: getAdminSiteUrl(),
         isProduction: false,
         isCustomDomainConfigured: false
       };

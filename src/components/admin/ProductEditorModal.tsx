@@ -27,6 +27,7 @@ import {
 } from '../../types';
 import { api } from '../../services/api';
 import { calculateProductStock } from '../../utils/stockCalculation';
+import { getAssetUrl } from '../../utils/assets';
 
 interface ProductEditorModalProps {
   product: Product;
@@ -484,7 +485,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
                       className="relative w-20 h-20 rounded-xl border border-slate-300 overflow-hidden bg-white group shadow-2xs"
                     >
                       <img
-                        src={img.trim()}
+                        src={getAssetUrl(img.trim())}
                         alt="Product Preview"
                         className="w-full h-full object-cover"
                         referrerPolicy="no-referrer"

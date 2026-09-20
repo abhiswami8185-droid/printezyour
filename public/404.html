@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting... - PrintezYour</title>
+    <script>
+      // Single Page Application redirect for GitHub Pages and static hosts
+      (function() {
+        var path = window.location.pathname;
+        var search = window.location.search;
+        var hash = window.location.hash;
+
+        // Segments of the path
+        var segments = path.split('/').filter(Boolean);
+
+        // If hosted under a subfolder repository like /printezyour/
+        // Keep the repo name segment in the base
+        var repoName = '';
+        var remainingPath = path;
+
+        // Check if first segment is the repo name (heuristic: not a known route)
+        var knownRoutes = ['home', 'products', 'product', 'services', 'quote', 'checkout', 'track', 'about', 'contact', 'policies', 'admin'];
+        if (segments.length > 0 && !knownRoutes.includes(segments[0])) {
+          repoName = '/' + segments[0];
+          remainingPath = '/' + segments.slice(1).join('/');
+        }
+
+        var redirectTarget = repoName + '/#' + remainingPath.replace(/^\//, '') + search + hash;
+        window.location.replace(redirectTarget);
+      })();
+    </script>
+  </head>
+  <body style="font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f8fafc; color: #0f172a; margin: 0;">
+    <div style="text-align: center; padding: 2rem;">
+      <h2 style="font-size: 1.25rem; margin-bottom: 0.5rem;">Redirecting to PrintezYour...</h2>
+      <p style="color: #64748b; font-size: 0.875rem;">Please wait while we transfer you to the application.</p>
+    </div>
+  </body>
+</html>

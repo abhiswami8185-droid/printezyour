@@ -16,6 +16,7 @@ import {
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { Category } from '../types';
+import { getAssetUrl } from '../utils/assets';
 
 interface HeaderProps {
   categories?: Category[];
@@ -98,10 +99,13 @@ export const Header: React.FC<HeaderProps> = ({ categories = [], currentView, on
         >
           <div className="h-11 sm:h-12 w-auto max-w-[240px] flex items-center justify-start">
             <img
-              src="/logo.png"
+              src={getAssetUrl('/logo.png')}
               alt="Printezyour - Your imagination, our print"
               className="h-full w-auto object-contain transition-transform group-hover:scale-[1.02]"
               referrerPolicy="no-referrer"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = getAssetUrl('/logo.svg');
+              }}
             />
           </div>
         </button>

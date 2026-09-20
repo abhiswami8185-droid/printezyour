@@ -16,6 +16,7 @@ import {
 import { Order, OrderStatus, PaymentStatus } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
+import { getAssetUrl } from '../../utils/assets';
 
 interface AdminOrdersProps {
   orders: Order[];
@@ -293,13 +294,14 @@ export const AdminOrders: React.FC<AdminOrdersProps> = ({ orders = [], onOrderUp
                 {(activeOrder.items || []).map(item => (
                   <div key={item.id} className="p-4 flex items-start gap-4">
                     <img
-                      src={(item.image && item.image.trim()) || '/images/products/visiting-cards-matte.jpg'}
+                      src={getAssetUrl((item.image && item.image.trim()) || '/images/products/visiting-cards-matte.jpg')}
                       alt={item.productName}
                       className="w-14 h-14 rounded-lg object-cover bg-slate-100 border shrink-0"
                       onError={(e) => {
                         const target = e.currentTarget;
-                        if (!target.src.includes('/images/products/visiting-cards-matte.jpg')) {
-                          target.src = '/images/products/visiting-cards-matte.jpg';
+                        const fallback = getAssetUrl('/images/products/visiting-cards-matte.jpg');
+                        if (target.src !== fallback) {
+                          target.src = fallback;
                         }
                       }}
                     />

@@ -12,6 +12,7 @@ import {
   Filter
 } from 'lucide-react';
 import { ServiceItem } from '../../types';
+import { getAssetUrl } from '../../utils/assets';
 
 interface AdminServicesTabProps {
   services: ServiceItem[];
@@ -234,14 +235,15 @@ export const AdminServicesTab: React.FC<AdminServicesTabProps> = ({
                   {/* Photo Banner with Direct Edit Action */}
                   <div className="relative h-48 bg-slate-100 overflow-hidden">
                     <img
-                      src={imgUrl}
+                      src={getAssetUrl(imgUrl)}
                       alt={service.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       referrerPolicy="no-referrer"
                       onError={e => {
                         const target = e.currentTarget;
-                        if (!target.src.includes('/images/services/visiting-cards.jpg')) {
-                          target.src = '/images/services/visiting-cards.jpg';
+                        const fallback = getAssetUrl('/images/services/visiting-cards.jpg');
+                        if (target.src !== fallback) {
+                          target.src = fallback;
                         }
                       }}
                     />
@@ -370,14 +372,15 @@ export const AdminServicesTab: React.FC<AdminServicesTabProps> = ({
                             title="Click to edit photo"
                           >
                             <img
-                              src={imgUrl}
+                              src={getAssetUrl(imgUrl)}
                               alt={service.name}
                               className="w-full h-full object-cover transition-transform group-hover:scale-105"
                               referrerPolicy="no-referrer"
                               onError={e => {
                                 const target = e.currentTarget;
-                                if (!target.src.includes('/images/services/visiting-cards.jpg')) {
-                                  target.src = '/images/services/visiting-cards.jpg';
+                                const fallback = getAssetUrl('/images/services/visiting-cards.jpg');
+                                if (target.src !== fallback) {
+                                  target.src = fallback;
                                 }
                               }}
                             />

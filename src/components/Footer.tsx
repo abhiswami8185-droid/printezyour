@@ -11,6 +11,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { Category } from '../types';
+import { getAssetUrl } from '../utils/assets';
 
 interface FooterProps {
   categories?: Category[];
@@ -74,10 +75,13 @@ export const Footer: React.FC<FooterProps> = ({ categories = [], onNavigate }) =
               title="PrintezYour - Go to Home"
             >
               <img
-                src="/logo.png"
+                src={getAssetUrl('/logo.png')}
                 alt="Printezyour - Your imagination, our print"
                 className="h-9 sm:h-10 w-auto object-contain"
                 referrerPolicy="no-referrer"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = getAssetUrl('/logo.svg');
+                }}
               />
             </button>
             <p className="text-slate-400 pr-4 text-xs">

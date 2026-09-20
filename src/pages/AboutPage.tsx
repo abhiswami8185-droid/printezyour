@@ -9,6 +9,7 @@ import {
   Clock,
   Sparkles
 } from 'lucide-react';
+import { getAssetUrl } from '../utils/assets';
 
 interface AboutPageProps {
   onNavigate: (view: string, param?: string) => void;
@@ -60,14 +61,15 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
 
         <div className="rounded-3xl overflow-hidden shadow-xl border border-slate-200 bg-slate-100 aspect-4/3 relative">
           <img
-            src="/images/services/offset-printing.jpg"
+            src={getAssetUrl('/images/services/offset-printing.jpg')}
             alt="Commercial printing press machinery"
             className="w-full h-full object-cover"
             referrerPolicy="no-referrer"
             onError={(e) => {
               const target = e.currentTarget;
-              if (!target.src.includes('/images/services/pamphlets-flyers.jpg')) {
-                target.src = '/images/services/pamphlets-flyers.jpg';
+              const fallback = getAssetUrl('/images/services/pamphlets-flyers.jpg');
+              if (target.src !== fallback) {
+                target.src = fallback;
               }
             }}
           />

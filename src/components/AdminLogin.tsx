@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Lock, Mail, Eye, EyeOff, ShieldCheck, AlertCircle, Info, KeyRound, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { getAssetUrl } from '../utils/assets';
 
 interface AdminLoginProps {
   onSuccess?: () => void;
@@ -48,10 +49,13 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, onExit }) => 
           <div className="text-center space-y-3 pb-6 border-b border-slate-800/80">
             <div className="bg-white rounded-xl px-4 py-2.5 inline-flex items-center justify-center shadow-lg border border-slate-200">
               <img
-                src="/logo.png"
+                src={getAssetUrl('/logo.png')}
                 alt="PrintezYour - Official Logo"
                 className="h-10 sm:h-11 w-auto object-contain"
                 referrerPolicy="no-referrer"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = getAssetUrl('/logo.svg');
+                }}
               />
             </div>
             <div>

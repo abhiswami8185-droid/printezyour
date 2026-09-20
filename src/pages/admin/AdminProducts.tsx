@@ -26,6 +26,7 @@ import { Product, Category, InventoryItem, Order, ServiceItem } from '../../type
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
 import { calculateProductStock } from '../../utils/stockCalculation';
+import { getAssetUrl } from '../../utils/assets';
 import { ProductEditorModal } from '../../components/admin/ProductEditorModal';
 import { ProductStockModal } from '../../components/admin/ProductStockModal';
 import { ImageManagementModal } from '../../components/admin/ImageManagementModal';
@@ -672,7 +673,7 @@ export const AdminProducts: React.FC<AdminProductsProps> = ({
                           >
                             {imgUrl ? (
                               <img
-                                src={imgUrl}
+                                src={getAssetUrl(imgUrl)}
                                 alt={product.name}
                                 className="w-full h-full object-cover transition-transform group-hover:scale-105"
                                 referrerPolicy="no-referrer"
@@ -875,7 +876,7 @@ export const AdminProducts: React.FC<AdminProductsProps> = ({
                 <div className="relative h-44 bg-slate-100 overflow-hidden">
                   {imgUrl ? (
                     <img
-                      src={imgUrl}
+                      src={getAssetUrl(imgUrl)}
                       alt={product.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       referrerPolicy="no-referrer"

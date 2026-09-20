@@ -9,6 +9,7 @@ import {
   X
 } from 'lucide-react';
 import { Product, Category } from '../types';
+import { getAssetUrl } from '../utils/assets';
 
 interface ProductsPageProps {
   products: Product[];
@@ -271,13 +272,14 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({
                   {/* Image */}
                   <div className="relative aspect-4/3 bg-slate-100 overflow-hidden">
                     <img
-                      src={(product.images && product.images[0]) || product.image || '/images/products/visiting-cards-matte.jpg'}
+                      src={getAssetUrl((product.images && product.images[0]) || product.image || '/images/products/visiting-cards-matte.jpg')}
                       alt={product.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
                         const target = e.currentTarget;
-                        if (!target.src.includes('/images/products/visiting-cards-matte.jpg')) {
-                          target.src = '/images/products/visiting-cards-matte.jpg';
+                        const fallback = getAssetUrl('/images/products/visiting-cards-matte.jpg');
+                        if (target.src !== fallback) {
+                          target.src = fallback;
                         }
                       }}
                     />

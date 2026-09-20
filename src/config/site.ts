@@ -26,7 +26,9 @@ export function getPublicSiteUrl(): string {
       const publicHost = host.replace(/^admin\./i, '');
       return `${protocol}//${publicHost}`;
     }
-    return window.location.origin;
+    const base = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '');
+    const cleanBase = (base === '.' || base === './') ? '' : base;
+    return `${window.location.origin}${cleanBase}`;
   }
 
   return 'http://localhost:3000';
@@ -37,7 +39,7 @@ export function getPublicSiteUrl(): string {
  * Priority:
  * 1. import.meta.env.VITE_ADMIN_SITE_URL (if provided at build/deploy time)
  * 2. Current window origin if already on an admin subdomain
- * 3. Safe development fallback: /#/admin on the current origin
+ * 3. Safe development/subpath fallback: /#/admin on the current origin
  */
 export function getAdminSiteUrl(): string {
   // Check build-time environment variable if configured
@@ -52,8 +54,9 @@ export function getAdminSiteUrl(): string {
     if (hostname.toLowerCase().startsWith('admin.')) {
       return origin;
     }
-    // In dev / preview / single-domain mode, use hash route
-    return `${origin}/#/admin`;
+    const base = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '');
+    const cleanBase = (base === '.' || base === './') ? '' : base;
+    return `${origin}${cleanBase}/#/admin`;
   }
 
   return 'http://localhost:3000/#/admin';

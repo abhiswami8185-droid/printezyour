@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
+import { getAssetUrl } from '../../utils/assets';
 import {
   Order,
   QuoteRequest,
@@ -264,10 +265,13 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
         <div className="p-4 border-b border-slate-800 flex items-center justify-between">
           <div className="bg-white rounded-xl px-3 py-1.5 shadow-md flex items-center w-full">
             <img
-              src="/logo.png"
+              src={getAssetUrl('/logo.png')}
               alt="Printezyour - Press Admin"
               className="h-8 w-auto object-contain"
               referrerPolicy="no-referrer"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = getAssetUrl('/logo.svg');
+              }}
             />
           </div>
         </div>

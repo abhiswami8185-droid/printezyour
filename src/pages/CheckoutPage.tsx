@@ -13,6 +13,7 @@ import {
 import { useCart } from '../context/CartContext';
 import { api } from '../services/api';
 import { Order } from '../types';
+import { getAssetUrl } from '../utils/assets';
 
 interface CheckoutPageProps {
   onOrderSuccess: (order: Order, whatsappData: any) => void;
@@ -360,13 +361,14 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onOrderSuccess, onNa
             {(items || []).map(item => (
               <div key={item.id} className="flex items-center gap-3 text-xs border-b border-slate-100 pb-3">
                 <img
-                  src={(item.image && item.image.trim()) || '/images/products/visiting-cards-matte.jpg'}
+                  src={getAssetUrl((item.image && item.image.trim()) || '/images/products/visiting-cards-matte.jpg')}
                   alt={item.productName}
                   className="w-12 h-12 rounded-lg object-cover bg-slate-100 border shrink-0"
                   onError={(e) => {
                     const target = e.currentTarget;
-                    if (!target.src.includes('/images/products/visiting-cards-matte.jpg')) {
-                      target.src = '/images/products/visiting-cards-matte.jpg';
+                    const fallback = getAssetUrl('/images/products/visiting-cards-matte.jpg');
+                    if (target.src !== fallback) {
+                      target.src = fallback;
                     }
                   }}
                 />

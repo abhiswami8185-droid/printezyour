@@ -72,7 +72,11 @@ export default function App() {
         return true;
       }
       if (typeof window !== 'undefined' && window.location) {
-        const pathname = window.location.pathname.replace(/\/+$/, '');
+        const base = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '');
+        let pathname = window.location.pathname.replace(/\/+$/, '');
+        if (base && base !== '.' && base !== './' && pathname.startsWith(base)) {
+          pathname = pathname.substring(base.length);
+        }
         if (pathname === '/admin' || pathname.startsWith('/admin/')) {
           const parts = pathname.split('/');
           setCurrentView('admin');

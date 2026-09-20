@@ -11,6 +11,7 @@ import {
   FileSpreadsheet
 } from 'lucide-react';
 import { ServiceItem } from '../types';
+import { getAssetUrl } from '../utils/assets';
 
 interface ServicesPageProps {
   services: ServiceItem[];
@@ -112,14 +113,15 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({ services = [], onNav
                 {/* Header with image */}
                 <div className="aspect-16/9 bg-slate-100 relative overflow-hidden">
                   <img
-                    src={serviceImage}
+                    src={getAssetUrl(serviceImage)}
                     alt={srv.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     referrerPolicy="no-referrer"
                     onError={(e) => {
                       const target = e.currentTarget;
-                      if (!target.src.includes('/images/services/visiting-cards.jpg')) {
-                        target.src = '/images/services/visiting-cards.jpg';
+                      const fallback = getAssetUrl('/images/services/visiting-cards.jpg');
+                      if (target.src !== fallback) {
+                        target.src = fallback;
                       }
                     }}
                   />
