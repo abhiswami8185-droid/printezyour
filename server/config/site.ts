@@ -16,9 +16,12 @@ export interface SiteConfig {
  * 4. Safe development fallback (http://localhost:3000)
  */
 export function getServerPublicSiteUrl(req?: Request): string {
-  // If explicitly provided via environment
+  // If explicitly provided via environment with a real custom domain
   if (process.env.PUBLIC_SITE_URL && process.env.PUBLIC_SITE_URL.trim() !== '') {
-    return process.env.PUBLIC_SITE_URL.trim().replace(/\/+$/, '');
+    const trimmed = process.env.PUBLIC_SITE_URL.trim().replace(/\/+$/, '');
+    if (!trimmed.includes('.ai.studio') && !trimmed.includes('example.com')) {
+      return trimmed;
+    }
   }
 
   // AI Studio automatically provides APP_URL in preview/dev
@@ -43,14 +46,17 @@ export function getServerPublicSiteUrl(req?: Request): string {
 /**
  * Returns the back-office admin URL.
  * Priority:
- * 1. Explicit environment variable ADMIN_SITE_URL
+ * 1. Explicit environment variable ADMIN_SITE_URL (if a real custom domain)
  * 2. If host on incoming request already starts with admin., use that host
  * 3. Safe development fallback: points to hash/path on public site (${publicSiteUrl}/#/admin)
  */
 export function getServerAdminSiteUrl(req?: Request): string {
-  // If explicitly provided via environment
+  // If explicitly provided via environment with a real custom domain
   if (process.env.ADMIN_SITE_URL && process.env.ADMIN_SITE_URL.trim() !== '') {
-    return process.env.ADMIN_SITE_URL.trim().replace(/\/+$/, '');
+    const trimmed = process.env.ADMIN_SITE_URL.trim().replace(/\/+$/, '');
+    if (!trimmed.includes('.ai.studio') && !trimmed.includes('example.com')) {
+      return trimmed;
+    }
   }
 
   // Check if incoming request is already hitting an admin subdomain

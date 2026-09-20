@@ -13,10 +13,13 @@ export interface ClientSiteConfig {
  * 3. Fallback http://localhost:3000
  */
 export function getPublicSiteUrl(): string {
-  // Check build-time environment variable if configured
+  // Check build-time environment variable if configured with a real domain (ignoring non-existent placeholders)
   const envUrl = import.meta.env.VITE_PUBLIC_SITE_URL;
   if (envUrl && typeof envUrl === 'string' && envUrl.trim() !== '') {
-    return envUrl.trim().replace(/\/+$/, '');
+    const trimmed = envUrl.trim().replace(/\/+$/, '');
+    if (!trimmed.includes('.ai.studio') && !trimmed.includes('example.com')) {
+      return trimmed;
+    }
   }
 
   // Safe browser runtime resolution in dev/preview
@@ -37,15 +40,18 @@ export function getPublicSiteUrl(): string {
 /**
  * Resolves the admin back-office URL for the client.
  * Priority:
- * 1. import.meta.env.VITE_ADMIN_SITE_URL (if provided at build/deploy time)
+ * 1. import.meta.env.VITE_ADMIN_SITE_URL (if provided with a real production domain)
  * 2. Current window origin if already on an admin subdomain
  * 3. Safe development/subpath fallback: /#/admin on the current origin
  */
 export function getAdminSiteUrl(): string {
-  // Check build-time environment variable if configured
+  // Check build-time environment variable if configured with a real domain
   const envUrl = import.meta.env.VITE_ADMIN_SITE_URL;
   if (envUrl && typeof envUrl === 'string' && envUrl.trim() !== '') {
-    return envUrl.trim().replace(/\/+$/, '');
+    const trimmed = envUrl.trim().replace(/\/+$/, '');
+    if (!trimmed.includes('.ai.studio') && !trimmed.includes('example.com')) {
+      return trimmed;
+    }
   }
 
   // Safe browser runtime resolution
@@ -75,7 +81,7 @@ export function isCurrentlyAdminDomain(): boolean {
   }
 
   const configuredAdmin = import.meta.env.VITE_ADMIN_SITE_URL;
-  if (configuredAdmin) {
+  if (configuredAdmin && !configuredAdmin.includes('.ai.studio')) {
     try {
       const adminUrl = new URL(configuredAdmin);
       if (adminUrl.hostname.toLowerCase() === hostname) {

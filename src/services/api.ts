@@ -51,19 +51,74 @@ const getHeaders = (_role?: UserRole): HeadersInit => {
 
 /**
  * Resolves the backend API URL.
- * If VITE_API_URL is configured (e.g. 'https://api.printezyour.com' when frontend is on GitHub Pages/Vercel),
- * it prepends the backend base URL.
- * Otherwise, uses the standard relative path '/api/...' (when running full-stack or on Node.js hosting).
+ * If running in full-stack dev/preview/monolith (same container as Express),
+ * always resolves to the clean relative endpoint '/api/...' on the same origin.
+ * If VITE_API_URL is configured with a real external backend (e.g. for GitHub Pages),
+ * it prepends the backend base URL (ignoring dummy/non-existent .ai.studio placeholders).
  */
 export const getApiUrl = (endpoint: string): string => {
-  const envUrl = import.meta.env.VITE_API_URL;
-  const base = (envUrl && typeof envUrl === 'string') ? envUrl.trim().replace(/\/+$/, '') : '';
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : ('/' + endpoint);
-  return base ? (base + cleanEndpoint) : cleanEndpoint;
+
+  // If in browser:
+  if (typeof window !== 'undefined' && window.location) {
+    const hostname = window.location.hostname.toLowerCase();
+    // When running inside AI Studio preview or local dev (Express + Vite monolith),
+    // always use relative paths so requests hit the local Express backend on the same origin.
+    if (
+      hostname.endsWith('.run.app') ||
+      hostname === 'localhost' ||
+      hostname === '127.0.0.1' ||
+      hostname.endsWith('.local')
+    ) {
+      return cleanEndpoint;
+    }
+  }
+
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl && typeof envUrl === 'string') {
+    const trimmed = envUrl.trim().replace(/\/+$/, '');
+    // Ignore placeholder/dummy domains that don't have an active API backend
+    if (
+      trimmed &&
+      !trimmed.includes('.ai.studio') &&
+      !trimmed.includes('example.com')
+    ) {
+      return trimmed + cleanEndpoint;
+    }
+  }
+
+  return cleanEndpoint;
 };
 
-const apiFetch = (url: string, init?: RequestInit): Promise<Response> => {
-  return fetch(getApiUrl(url), init);
+const apiFetch = async (url: string, init?: RequestInit): Promise<Response> => {
+  const resolvedUrl = getApiUrl(url);
+  const cleanEndpoint = url.startsWith('/') ? url : ('/' + url);
+
+  try {
+    const res = await fetch(resolvedUrl, init);
+    // If an external endpoint returns 5xx server error, try fallback to relative
+    if (!res.ok && resolvedUrl !== cleanEndpoint && res.status >= 500) {
+      try {
+        const fallbackRes = await fetch(cleanEndpoint, init);
+        if (fallbackRes.ok) return fallbackRes;
+      } catch {
+        // use original res
+      }
+    }
+    return res;
+  } catch (err) {
+    // If external fetch threw a network error (e.g. Failed to fetch, DNS failure, CORS failure),
+    // and resolvedUrl was not the relative endpoint, fallback immediately to the same-origin relative path.
+    if (resolvedUrl !== cleanEndpoint) {
+      try {
+        const fallbackRes = await fetch(cleanEndpoint, init);
+        return fallbackRes;
+      } catch {
+        // throw original error if relative also fails
+      }
+    }
+    throw err;
+  }
 };
 
 export const api = {
