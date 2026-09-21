@@ -133,9 +133,24 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onOrderSuccess, onNa
         {/* Left Col: Customer & Delivery Details (7 cols) */}
         <div className="lg:col-span-7 space-y-6">
           {error && (
-            <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>{error}</span>
+            <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800 space-y-2">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                <span className="font-semibold">{error}</span>
+              </div>
+              <p className="text-[11px] text-amber-700">
+                You can also place this order directly with our Chandigarh production desk via WhatsApp:
+              </p>
+              <a
+                href={`https://wa.me/918557049897?text=${encodeURIComponent(
+                  `*DIRECT PRINT ORDER*\nName: ${customer.name || 'Customer'}\nMobile: ${customer.mobile}\nItems:\n${items.map(i => `• ${i.productName} (${i.quantity} units)`).join('\n')}\nEst. Total: ₹${finalTotal}`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold"
+              >
+                Send Order to WhatsApp (+91 8557049897)
+              </a>
             </div>
           )}
 

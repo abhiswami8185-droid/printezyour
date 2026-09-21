@@ -19,6 +19,7 @@ import { useCart } from '../context/CartContext';
 import { api } from '../services/api';
 import { calculateProductStock } from '../utils/stockCalculation';
 import { getAssetUrl } from '../utils/assets';
+import { fallbackProducts } from '../data/fallbackData';
 
 interface ProductDetailPageProps {
   product?: Product;
@@ -56,7 +57,11 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           setProduct(p);
         })
         .catch(err => {
-          console.error('Failed to load product:', err);
+          console.warn('API product fetch failed, checking fallback catalog:', err);
+          const fallback = fallbackProducts.find(p => p.slug === productSlug || p.id === productSlug);
+          if (fallback) {
+            setProduct(fallback);
+          }
         })
         .finally(() => setLoading(false));
     }

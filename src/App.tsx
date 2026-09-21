@@ -26,27 +26,32 @@ import {
   navigateToAdmin,
   navigateToStorefront
 } from './config/site';
+import {
+  fallbackCategories,
+  fallbackServices,
+  fallbackProducts,
+  fallbackSettings
+} from './data/fallbackData';
 
 export default function App() {
   const [currentView, setCurrentView] = useState<string>('home');
   const [viewParam, setViewParam] = useState<string | undefined>(undefined);
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
 
-  // App data loaded from backend
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [services, setServices] = useState<ServiceItem[]>([]);
-  const [settings, setSettings] = useState<BusinessSettings | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [initError, setInitError] = useState<string | null>(null);
+  // App data initialized with safe storefront fallback catalog so public pages and navigation are immediately usable
+  const [products, setProducts] = useState<Product[]>(fallbackProducts);
+  const [categories, setCategories] = useState<Category[]>(fallbackCategories);
+  const [services, setServices] = useState<ServiceItem[]>(fallbackServices);
+  const [settings, setSettings] = useState<BusinessSettings>(fallbackSettings);
+  const [loading, setLoading] = useState(false);
+  const [isUsingFallback, setIsUsingFallback] = useState(false);
+  const [apiNoticeDismissed, setApiNoticeDismissed] = useState(false);
 
   // Confirmed order data
   const [confirmedOrder, setConfirmedOrder] = useState<Order | null>(null);
   const [confirmedWhatsApp, setConfirmedWhatsApp] = useState<any>(null);
 
   const loadData = async () => {
-    setLoading(true);
-    setInitError(null);
     try {
       const [prodsRes, srvsRes, setsRes, catsRes] = await Promise.allSettled([
         api.getProducts(),
@@ -55,33 +60,31 @@ export default function App() {
         api.getCategories()
       ]);
 
-      let hasAnySuccess = false;
+      let liveApiConnected = false;
 
-      if (prodsRes.status === 'fulfilled' && Array.isArray(prodsRes.value)) {
+      // Real live API data takes priority whenever the backend is reachable
+      if (prodsRes.status === 'fulfilled' && Array.isArray(prodsRes.value) && prodsRes.value.length > 0) {
         setProducts(prodsRes.value);
-        hasAnySuccess = true;
+        liveApiConnected = true;
       }
-      if (srvsRes.status === 'fulfilled' && Array.isArray(srvsRes.value)) {
+      if (srvsRes.status === 'fulfilled' && Array.isArray(srvsRes.value) && srvsRes.value.length > 0) {
         setServices(srvsRes.value);
-        hasAnySuccess = true;
+        liveApiConnected = true;
       }
       if (setsRes.status === 'fulfilled' && setsRes.value) {
         setSettings(setsRes.value);
-        hasAnySuccess = true;
+        liveApiConnected = true;
       }
-      if (catsRes.status === 'fulfilled' && Array.isArray(catsRes.value)) {
+      if (catsRes.status === 'fulfilled' && Array.isArray(catsRes.value) && catsRes.value.length > 0) {
         setCategories(catsRes.value);
-        hasAnySuccess = true;
+        liveApiConnected = true;
       }
 
-      if (!hasAnySuccess) {
-        const firstError = [prodsRes, srvsRes, setsRes, catsRes].find(r => r.status === 'rejected') as PromiseRejectedResult | undefined;
-        const msg = firstError?.reason?.message || 'Unable to connect to store server';
-        setInitError(msg);
-      }
+      // If backend was unreachable or returned errors (e.g. on static GitHub Pages), flag fallback mode
+      setIsUsingFallback(!liveApiConnected);
     } catch (err: any) {
-      console.error('Error initializing store data:', err);
-      setInitError(err?.message || 'Failed to initialize store data');
+      console.warn('Backend API unavailable, using storefront catalog fallback:', err);
+      setIsUsingFallback(true);
     } finally {
       setLoading(false);
     }
@@ -209,30 +212,28 @@ export default function App() {
 
           {/* Main View Container */}
           <main className="flex-1">
-            {loading ? (
-              <div className="py-24 text-center space-y-3">
-                <div className="w-10 h-10 border-3 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-xs text-slate-500 font-semibold">Connecting to PrintezYour press server...</p>
-              </div>
-            ) : initError && products.length === 0 ? (
-              <div className="max-w-md mx-auto my-16 p-6 bg-white border border-slate-200 rounded-xl shadow-sm text-center space-y-4">
-                <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mx-auto text-xl font-bold">
-                  !
+            {/* Non-blocking informational banner when running on static fallback without backend */}
+            {isUsingFallback && !apiNoticeDismissed && (
+              <div className="bg-amber-50/90 border-b border-amber-200/80 px-4 py-2 text-xs text-amber-900 transition-all">
+                <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
+                    <p className="font-medium text-[11px] sm:text-xs">
+                      <span className="font-bold">Storefront Catalog Mode:</span> Browsing static product & service catalog. For custom prints and instant orders, WhatsApp us directly at <a href="tel:+918557049897" className="underline font-bold">+91 8557049897</a>.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setApiNoticeDismissed(true)}
+                    className="text-amber-700 hover:text-amber-950 font-bold px-2 py-0.5 rounded transition-colors text-xs shrink-0"
+                    aria-label="Dismiss notice"
+                  >
+                    ✕
+                  </button>
                 </div>
-                <h3 className="text-lg font-bold text-slate-800">Connection to Store Engine</h3>
-                <p className="text-xs text-slate-600">
-                  {initError}
-                </p>
-                <button
-                  onClick={() => loadData()}
-                  className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors shadow-sm"
-                >
-                  Retry Connection
-                </button>
               </div>
-            ) : (
-              <>
-                {currentView === 'home' && (
+            )}
+
+            {currentView === 'home' && (
                   <HomePage
                     products={products}
                     categories={categories}
@@ -306,8 +307,6 @@ export default function App() {
                     onNavigate={handleNavigate}
                   />
                 )}
-              </>
-            )}
           </main>
 
           {/* Site Footer */}
