@@ -3,6 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      // Suppress benign Vite WebSocket HMR disconnection in sandbox iframe where HMR is disabled
+      window.addEventListener('unhandledrejection', function (e) {
+        var msg = e.reason && (e.reason.message || String(e.reason));
+        if (msg && msg.indexOf('WebSocket') !== -1) {
+          e.preventDefault();
+        }
+      });
+      var _origErr = console.error;
+      console.error = function () {
+        var str = Array.prototype.slice.call(arguments).join(' ');
+        if (str.indexOf('failed to connect to websocket') !== -1 || str.indexOf('WebSocket closed without opened') !== -1) {
+          return;
+        }
+        _origErr.apply(console, arguments);
+      };
+      var _origDbg = console.debug;
+      console.debug = function () {
+        var str = Array.prototype.slice.call(arguments).join(' ');
+        if (str.indexOf('[vite]') !== -1) {
+          return;
+        }
+        _origDbg.apply(console, arguments);
+      };
+    </script>
     <link rel="icon" type="image/svg+xml" href="./logo-icon.svg" />
     <link rel="alternate icon" type="image/png" href="./logo.png" />
     <title>PrintezYour - Modern Printing & E-Commerce System</title>

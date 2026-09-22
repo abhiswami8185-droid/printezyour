@@ -6,8 +6,8 @@ import { apiRouter } from './server/routes/api';
 
 async function startServer() {
   const app = express();
-  // Support PORT from hosting environment (Hostinger, Cloud Run, VPS) or default to 3000
-  const PORT = Number(process.env.PORT) || 3000;
+  // Port 3000 is required by the reverse proxy infrastructure
+  const PORT = 3000;
 
   app.set('trust proxy', true);
 
@@ -64,7 +64,10 @@ async function startServer() {
   // Vite middleware for dev / static for prod
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: {
+        middlewareMode: true,
+        hmr: false
+      },
       appType: 'spa'
     });
     app.use(vite.middlewares);

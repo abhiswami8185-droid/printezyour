@@ -17,7 +17,10 @@ import { TrackOrderPage } from './pages/TrackOrderPage';
 import { AboutPage } from './pages/AboutPage';
 import { ContactPage } from './pages/ContactPage';
 import { PoliciesPage } from './pages/PoliciesPage';
-import { AdminLayout } from './pages/admin/AdminLayout';
+
+const AdminLayout = React.lazy(() =>
+  import('./pages/admin/AdminLayout').then(m => ({ default: m.AdminLayout }))
+);
 
 import { api } from './services/api';
 import { Product, Category, ServiceItem, BusinessSettings, Order } from './types';
@@ -185,10 +188,21 @@ export default function App() {
   if (currentView === 'admin') {
     return (
       <AuthProvider>
-        <AdminLayout
-          onExitAdmin={() => navigateToStorefront(() => handleNavigate('home'))}
-          initialTab={viewParam || 'dashboard'}
-        />
+        <React.Suspense
+          fallback={
+            <div className="min-h-screen bg-slate-900 flex items-center justify-center text-white text-sm">
+              <div className="flex items-center gap-3">
+                <div className="w-5 h-5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
+                <span>Loading Administration Console...</span>
+              </div>
+            </div>
+          }
+        >
+          <AdminLayout
+            onExitAdmin={() => navigateToStorefront(() => handleNavigate('home'))}
+            initialTab={viewParam || 'dashboard'}
+          />
+        </React.Suspense>
       </AuthProvider>
     );
   }
