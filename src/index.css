@@ -133,3 +133,36 @@
     box-shadow: 0 1px 0 0 #0369a1, 0 2px 4px rgba(2, 132, 199, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
   }
 }
+
+/* Print Stylesheet for A4 GST & Non-GST Invoices */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-invoice-sheet, #printable-invoice-sheet * {
+    visibility: visible;
+  }
+  #printable-invoice-sheet {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+}
+

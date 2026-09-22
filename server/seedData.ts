@@ -12,26 +12,26 @@ import {
 } from '../src/types';
 
 export const initialCategories: Category[] = [
-  { id: 'cat-1', name: 'Visiting Cards', slug: 'visiting-cards', description: 'Premium business cards with matte, gloss, velvet, and spot UV finishes', displayOrder: 1, active: true },
-  { id: 'cat-2', name: 'Stickers & Labels', slug: 'stickers-labels', description: 'Custom die-cut stickers, waterproof vinyl labels, barcode & product tags', displayOrder: 2, active: true },
-  { id: 'cat-3', name: 'Flex & Banner Printing', slug: 'flex-banner', description: 'High-resolution outdoor star flex, frontlit & backlit banners for events & hoardings', displayOrder: 3, active: true },
-  { id: 'cat-4', name: 'Carry Bags', slug: 'carry-bags', description: 'Eco-friendly paper bags, D-cut non-woven, and branded retail shopping bags', displayOrder: 4, active: true },
-  { id: 'cat-5', name: 'Butter Paper Printing', slug: 'butter-paper', description: 'Food-grade oil-resistant custom printed butter paper for bakeries & restaurants', displayOrder: 5, active: true },
-  { id: 'cat-6', name: 'Customized Printing', slug: 'customized-printing', description: 'Mugs, t-shirts, keychains, custom gifts, and bespoke personalized merchandise', displayOrder: 6, active: true },
-  { id: 'cat-7', name: 'Sunboard Printing', slug: 'sunboard-printing', description: 'Direct UV print & vinyl mounted rigid foam sunboards for displays and exhibitions', displayOrder: 7, active: true },
-  { id: 'cat-8', name: 'Pen Printing', slug: 'pen-printing', description: 'Corporate metal & plastic pens engraved or screen-printed with brand logos', displayOrder: 8, active: true },
-  { id: 'cat-9', name: 'Boxes & Packaging', slug: 'boxes-packaging', description: 'Rigid gift boxes, mono cartons, corrugated shipping boxes with custom branding', displayOrder: 9, active: true },
-  { id: 'cat-10', name: 'Pamphlets / Flyers', slug: 'pamphlets-flyers', description: 'High-volume promotional leaflets, trifold brochures, and newspaper inserts', displayOrder: 10, active: true },
-  { id: 'cat-11', name: 'E-commerce Packaging', slug: 'ecommerce-packaging', description: 'Security courier bags, branded shipping mailers, and custom packaging tapes', displayOrder: 11, active: true },
-  { id: 'cat-12', name: 'Tags / Hanging Tags', slug: 'hanging-tags', description: 'Apparel hang tags, barcode price tags, metallic string tags with eyelets', displayOrder: 12, active: true },
-  { id: 'cat-13', name: 'Letterheads', slug: 'letterheads', description: 'Executive bond paper letterheads for official corporate correspondence', displayOrder: 13, active: true },
-  { id: 'cat-14', name: 'Envelopes', slug: 'envelopes', description: 'Custom printed window & non-window business envelopes in all standard sizes', displayOrder: 14, active: true },
-  { id: 'cat-15', name: 'ID Cards', slug: 'id-cards', description: 'Durable PVC RFID/barcode smart ID cards, printed lanyards, and card holders', displayOrder: 15, active: true },
-  { id: 'cat-16', name: 'Legal Documents', slug: 'legal-documents', description: 'Non-tearable bond sheets, stamp paper binding, legal briefs, and dossier folders', displayOrder: 16, active: true },
-  { id: 'cat-17', name: 'Corporate Printing', slug: 'corporate-printing', description: 'Annual reports, presentation folders, certificates, executive desk diaries', displayOrder: 17, active: true },
-  { id: 'cat-18', name: 'Customized Branding', slug: 'customized-branding', description: 'Complete brand collateral setups: uniforms, signages, stationery sets', displayOrder: 18, active: true },
-  { id: 'cat-19', name: 'Promotional Printing', slug: 'promotional-printing', description: 'Tent cards, danglers, roll-up standees, canopies, and promotional flags', displayOrder: 19, active: true },
-  { id: 'cat-20', name: 'Specialty Finishing', slug: 'specialty-finishing', description: 'Foil stamping, thermal embossing, spot gloss, rounded die-cutting', displayOrder: 20, active: true }
+  { id: 'cat-1', name: 'Visiting Cards', slug: 'visiting-cards', description: 'Premium business cards with matte, gloss, velvet, and spot UV finishes', displayOrder: 1, active: true, image: '/images/categories/visiting-cards.svg' },
+  { id: 'cat-2', name: 'Stickers & Labels', slug: 'stickers-labels', description: 'Custom die-cut stickers, waterproof vinyl labels, barcode & product tags', displayOrder: 2, active: true, image: '/images/categories/stickers-labels.svg' },
+  { id: 'cat-3', name: 'Flex & Banner Printing', slug: 'flex-banner', description: 'High-resolution outdoor star flex, frontlit & backlit banners for events & hoardings', displayOrder: 3, active: true, image: '/images/categories/flex-banner.svg' },
+  { id: 'cat-4', name: 'Carry Bags', slug: 'carry-bags', description: 'Eco-friendly paper bags, D-cut non-woven, and branded retail shopping bags', displayOrder: 4, active: true, image: '/images/categories/carry-bags.svg' },
+  { id: 'cat-5', name: 'Butter Paper Printing', slug: 'butter-paper', description: 'Food-grade oil-resistant custom printed butter paper for bakeries & restaurants', displayOrder: 5, active: true, image: '/images/categories/butter-paper.svg' },
+  { id: 'cat-6', name: 'Customized Printing', slug: 'customized-printing', description: 'Mugs, t-shirts, keychains, custom gifts, and bespoke personalized merchandise', displayOrder: 6, active: true, image: '/images/categories/customized-printing.svg' },
+  { id: 'cat-7', name: 'Sunboard Printing', slug: 'sunboard-printing', description: 'Direct UV print & vinyl mounted rigid foam sunboards for displays and exhibitions', displayOrder: 7, active: true, image: '/images/categories/sunboard-printing.svg' },
+  { id: 'cat-8', name: 'Pen Printing', slug: 'pen-printing', description: 'Corporate metal & plastic pens engraved or screen-printed with brand logos', displayOrder: 8, active: true, image: '/images/categories/pen-printing.svg' },
+  { id: 'cat-9', name: 'Boxes & Packaging', slug: 'boxes-packaging', description: 'Rigid gift boxes, mono cartons, corrugated shipping boxes with custom branding', displayOrder: 9, active: true, image: '/images/categories/boxes-packaging.svg' },
+  { id: 'cat-10', name: 'Pamphlets / Flyers', slug: 'pamphlets-flyers', description: 'High-volume promotional leaflets, trifold brochures, and newspaper inserts', displayOrder: 10, active: true, image: '/images/categories/pamphlets-flyers.svg' },
+  { id: 'cat-11', name: 'E-commerce Packaging', slug: 'ecommerce-packaging', description: 'Security courier bags, branded shipping mailers, and custom packaging tapes', displayOrder: 11, active: true, image: '/images/categories/ecommerce-packaging.svg' },
+  { id: 'cat-12', name: 'Tags / Hanging Tags', slug: 'hanging-tags', description: 'Apparel hang tags, barcode price tags, metallic string tags with eyelets', displayOrder: 12, active: true, image: '/images/categories/hanging-tags.svg' },
+  { id: 'cat-13', name: 'Letterheads', slug: 'letterheads', description: 'Executive bond paper letterheads for official corporate correspondence', displayOrder: 13, active: true, image: '/images/categories/letterheads.svg' },
+  { id: 'cat-14', name: 'Envelopes', slug: 'envelopes', description: 'Custom printed window & non-window business envelopes in all standard sizes', displayOrder: 14, active: true, image: '/images/categories/envelopes.svg' },
+  { id: 'cat-15', name: 'ID Cards', slug: 'id-cards', description: 'Durable PVC RFID/barcode smart ID cards, printed lanyards, and card holders', displayOrder: 15, active: true, image: '/images/categories/id-cards.svg' },
+  { id: 'cat-16', name: 'Legal Documents', slug: 'legal-documents', description: 'Non-tearable bond sheets, stamp paper binding, legal briefs, and dossier folders', displayOrder: 16, active: true, image: '/images/categories/legal-documents.svg' },
+  { id: 'cat-17', name: 'Corporate Printing', slug: 'corporate-printing', description: 'Annual reports, presentation folders, certificates, executive desk diaries', displayOrder: 17, active: true, image: '/images/categories/corporate-printing.svg' },
+  { id: 'cat-18', name: 'Customized Branding', slug: 'customized-branding', description: 'Complete brand collateral setups: uniforms, signages, stationery sets', displayOrder: 18, active: true, image: '/images/categories/customized-branding.svg' },
+  { id: 'cat-19', name: 'Promotional Printing', slug: 'promotional-printing', description: 'Tent cards, danglers, roll-up standees, canopies, and promotional flags', displayOrder: 19, active: true, image: '/images/categories/promotional-printing.svg' },
+  { id: 'cat-20', name: 'Specialty Finishing', slug: 'specialty-finishing', description: 'Foil stamping, thermal embossing, spot gloss, rounded die-cutting', displayOrder: 20, active: true, image: '/images/categories/specialty-finishing.svg' }
 ];
 
 export const initialServices: ServiceItem[] = [

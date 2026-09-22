@@ -11,24 +11,35 @@ import {
   X,
   AlertCircle,
   Truck,
-  ExternalLink
+  ExternalLink,
+  Receipt
 } from 'lucide-react';
-import { Order, OrderStatus, PaymentStatus } from '../../types';
+import { Order, OrderStatus, PaymentStatus, BusinessSettings } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
 import { getAssetUrl } from '../../utils/assets';
+import { BillingModal } from '../../components/billing/BillingModal';
 
 interface AdminOrdersProps {
   orders: Order[];
+  settings?: BusinessSettings | null;
   onOrderUpdated: () => void;
   selectedOrderId?: string;
 }
 
-export const AdminOrders: React.FC<AdminOrdersProps> = ({ orders = [], onOrderUpdated, selectedOrderId }) => {
+export const AdminOrders: React.FC<AdminOrdersProps> = ({ orders = [], settings = null, onOrderUpdated, selectedOrderId }) => {
   const { role, user } = useAuth();
   const safeOrders = Array.isArray(orders) ? orders : [];
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('All');
+  const [billingOrder, setBillingOrder] = useState<Order | null>(null);
+  const [businessSettings, setBusinessSettings] = useState<BusinessSettings | null>(settings);
+
+  React.useEffect(() => {
+    if (!businessSettings) {
+      api.getSettings().then(setBusinessSettings).catch(() => {});
+    }
+  }, [businessSettings]);
   const [activeOrder, setActiveOrder] = useState<Order | null>(() => {
     if (selectedOrderId) {
       return safeOrders.find(o => o.id === selectedOrderId) || null;
@@ -227,13 +238,23 @@ export const AdminOrders: React.FC<AdminOrdersProps> = ({ orders = [], onOrderUp
                         )}
                       </td>
                       <td className="p-3.5 pr-5 text-right">
-                        <button
-                          onClick={() => setActiveOrder(order)}
-                          className="bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-colors inline-flex items-center gap-1"
-                        >
-                          <Eye className="w-3 h-3" />
-                          <span>Details</span>
-                        </button>
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => setBillingOrder(order)}
+                            className="bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors inline-flex items-center gap-1"
+                            title="Generate GST or Non-GST Invoice"
+                          >
+                            <Receipt className="w-3 h-3" />
+                            <span>Bill</span>
+                          </button>
+                          <button
+                            onClick={() => setActiveOrder(order)}
+                            className="bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-colors inline-flex items-center gap-1"
+                          >
+                            <Eye className="w-3 h-3" />
+                            <span>Details</span>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -406,6 +427,17 @@ export const AdminOrders: React.FC<AdminOrdersProps> = ({ orders = [], onOrderUp
                     </button>
                   ))}
                 </div>
+
+                <div className="pt-2 border-t border-slate-200">
+                  <button
+                    type="button"
+                    onClick={() => setBillingOrder(activeOrder)}
+                    className="w-full bg-slate-900 hover:bg-blue-900 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition-colors"
+                  >
+                    <Receipt className="w-4 h-4 text-cyan-400" />
+                    <span>Generate & Print Bill (GST / Non-GST)</span>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -429,6 +461,15 @@ export const AdminOrders: React.FC<AdminOrdersProps> = ({ orders = [], onOrderUp
             </div>
           </div>
         </div>
+      )}
+
+      {/* Production Billing Modal */}
+      {billingOrder && (
+        <BillingModal
+          order={billingOrder}
+          settings={businessSettings}
+          onClose={() => setBillingOrder(null)}
+        />
       )}
     </div>
   );

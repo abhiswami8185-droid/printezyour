@@ -352,23 +352,131 @@ export const HomePage: React.FC<HomePageProps> = ({
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-4">
-            {(categories || []).map((cat, idx) => (
-              <button
-                key={cat.id}
-                onClick={() => onNavigate('products', cat.slug)}
-                className="bg-white p-4 rounded-xl border border-slate-200/80 text-left hover:border-blue-500 hover:shadow-md transition-all group focus:outline-hidden"
-              >
-                <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 font-bold text-xs flex items-center justify-center mb-2.5 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                  {idx + 1}
-                </div>
-                <h4 className="font-bold text-xs text-slate-900 group-hover:text-blue-700 transition-colors line-clamp-1">
-                  {cat.name}
-                </h4>
-                <p className="text-[11px] text-slate-500 line-clamp-2 mt-1 leading-snug">
-                  {cat.description}
-                </p>
-              </button>
-            ))}
+            {(categories || []).map((cat, idx) => {
+              const categoryVisualMap: Record<string, { image: string; alt: string }> = {
+                'visiting-cards': {
+                  image: '/images/categories/visiting-cards.svg',
+                  alt: 'Premium printed visiting cards with gold foil and velvet matte finish'
+                },
+                'stickers-labels': {
+                  image: '/images/categories/stickers-labels.svg',
+                  alt: 'Custom die-cut vinyl stickers and waterproof product labels'
+                },
+                'flex-banner': {
+                  image: '/images/categories/flex-banner.svg',
+                  alt: 'Heavy-duty outdoor flex and banner signage with corner brass grommets'
+                },
+                'carry-bags': {
+                  image: '/images/categories/carry-bags.svg',
+                  alt: 'Eco-friendly branded kraft carry bags with twisted paper handles'
+                },
+                'butter-paper': {
+                  image: '/images/categories/butter-paper.svg',
+                  alt: 'Food-grade printed butter paper and bakery wrapping sheets'
+                },
+                'customized-printing': {
+                  image: '/images/categories/customized-printing.svg',
+                  alt: 'Personalized promotional printing including custom mugs and branded apparel'
+                },
+                'sunboard-printing': {
+                  image: '/images/categories/sunboard-printing.svg',
+                  alt: 'Rigid printed sunboard foam display board with high-resolution UV graphics'
+                },
+                'pen-printing': {
+                  image: '/images/categories/pen-printing.svg',
+                  alt: 'Custom branded corporate pens with precision printed and engraved logos'
+                },
+                'boxes-packaging': {
+                  image: '/images/categories/boxes-packaging.svg',
+                  alt: 'Custom printed corrugated mailer packaging boxes with secure tuck flaps'
+                },
+                'pamphlets-flyers': {
+                  image: '/images/categories/pamphlets-flyers.svg',
+                  alt: 'Printed tri-fold brochures and promotional pamphlets with gloss finish'
+                },
+                'ecommerce-packaging': {
+                  image: '/images/categories/ecommerce-packaging.svg',
+                  alt: 'Branded e-commerce courier bags, tamper-proof mailers and packaging tape'
+                },
+                'hanging-tags': {
+                  image: '/images/categories/hanging-tags.svg',
+                  alt: 'Apparel product hanging tags with eyelet string and barcode details'
+                },
+                'letterheads': {
+                  image: '/images/categories/letterheads.svg',
+                  alt: 'Corporate business letterheads printed on premium executive bond paper'
+                },
+                'envelopes': {
+                  image: '/images/categories/envelopes.svg',
+                  alt: 'Branded commercial envelopes with secure adhesive flap and window styles'
+                },
+                'id-cards': {
+                  image: '/images/categories/id-cards.svg',
+                  alt: 'Professional PVC employee ID card with lanyard strap and clip'
+                },
+                'legal-documents': {
+                  image: '/images/categories/legal-documents.svg',
+                  alt: 'Professionally bound legal document folders and corporate dossiers'
+                },
+                'corporate-printing': {
+                  image: '/images/categories/corporate-printing.svg',
+                  alt: 'Executive corporate diaries, presentation folders and annual reports'
+                },
+                'customized-branding': {
+                  image: '/images/categories/customized-branding.svg',
+                  alt: 'Complete corporate brand identity package with stationery and apparel'
+                },
+                'promotional-printing': {
+                  image: '/images/categories/promotional-printing.svg',
+                  alt: 'Promotional roll-up standees, tabletop tent cards and exhibition displays'
+                },
+                'specialty-finishing': {
+                  image: '/images/categories/specialty-finishing.svg',
+                  alt: 'Specialty print finishing showcasing metallic foil stamping, Spot UV and embossing'
+                }
+              };
+
+              const meta = categoryVisualMap[cat.slug] || {
+                image: cat.image || `/images/categories/${cat.slug}.svg`,
+                alt: `${cat.name} printing & branding by PrintezYour`
+              };
+              const imageSrc = getAssetUrl(cat.image || meta.image);
+
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => onNavigate('products', cat.slug)}
+                  className="bg-white rounded-2xl border border-slate-200/90 text-left hover:border-blue-500 hover:shadow-lg transition-all duration-300 group focus:outline-hidden flex flex-col overflow-hidden"
+                >
+                  <div className="relative w-full aspect-4/3 bg-slate-900 overflow-hidden">
+                    <img
+                      src={imageSrc}
+                      alt={meta.alt}
+                      loading="lazy"
+                      className="w-full h-full object-cover transform transition-transform duration-500 ease-out group-hover:scale-108"
+                    />
+                    <div className="absolute top-2.5 left-2.5 bg-slate-900/80 backdrop-blur-xs text-white text-[10px] font-bold px-2 py-0.5 rounded-md border border-white/10 shadow-xs">
+                      #{idx + 1 < 10 ? `0${idx + 1}` : idx + 1}
+                    </div>
+                  </div>
+
+                  <div className="p-3.5 sm:p-4 flex-1 flex flex-col justify-between">
+                    <div>
+                      <h4 className="font-bold text-xs sm:text-sm text-slate-900 group-hover:text-blue-700 transition-colors line-clamp-1">
+                        {cat.name}
+                      </h4>
+                      <p className="text-[11px] text-slate-500 line-clamp-2 mt-1 leading-snug">
+                        {cat.description}
+                      </p>
+                    </div>
+                    <div className="mt-3 flex items-center gap-1 text-[11px] font-semibold text-blue-700 opacity-90 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all">
+                      <span>Explore Products</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
           </div>
 
           <div className="text-center pt-4">

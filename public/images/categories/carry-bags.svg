@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg4" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#111827" />
+      <stop offset="100%" stop-color="#1f2937" />
+    </linearGradient>
+    <linearGradient id="kraftBag" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#c29b68" />
+      <stop offset="50%" stop-color="#d4b07d" />
+      <stop offset="100%" stop-color="#b08855" />
+    </linearGradient>
+    <linearGradient id="bagGusset" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#9a7342" />
+      <stop offset="100%" stop-color="#7c5c32" />
+    </linearGradient>
+    <filter id="bagShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="12" flood-color="#000" flood-opacity="0.55" />
+    </filter>
+  </defs>
+
+  <rect width="400" height="300" fill="url(#bg4)" />
+
+  <g transform="translate(110, 40)" filter="url(#bagShadow)">
+    <!-- Twisted Paper Rope Handle (Back loop) -->
+    <path d="M 60 70 C 60 -10, 120 -10, 120 70" fill="none" stroke="#78552b" stroke-width="7" stroke-linecap="round" />
+    <path d="M 60 70 C 60 -10, 120 -10, 120 70" fill="none" stroke="#b08855" stroke-width="4" stroke-linecap="round" />
+
+    <!-- 3D Bag Side Gusset (Depth panel) -->
+    <polygon points="145,55 180,45 180,215 145,230" fill="url(#bagGusset)" stroke="#6b4c24" stroke-width="1" />
+    <!-- Gusset inner crease fold -->
+    <line x1="162" y1="50" x2="162" y2="222" stroke="#5c401d" stroke-width="1.5" stroke-dasharray="4,2" />
+
+    <!-- Main Front Bag Face -->
+    <polygon points="15,55 145,55 145,230 15,230" fill="url(#kraftBag)" stroke="#9a7342" stroke-width="1" />
+
+    <!-- Turnover top hem fold -->
+    <polygon points="15,55 145,55 145,72 15,72" fill="#b08855" opacity="0.6" />
+
+    <!-- Twisted Paper Rope Handle (Front loop) -->
+    <path d="M 45 70 C 45 0, 105 0, 105 70" fill="none" stroke="#634520" stroke-width="7" stroke-linecap="round" />
+    <path d="M 45 70 C 45 0, 105 0, 105 70" fill="none" stroke="#d4b07d" stroke-width="4" stroke-linecap="round" />
+
+    <!-- Handle Anchor Reinforcement Patches -->
+    <rect x="38" y="66" width="14" height="10" rx="3" fill="#8c6534" />
+    <rect x="98" y="66" width="14" height="10" rx="3" fill="#8c6534" />
+
+    <!-- Branded Silk-Screen Print on Kraft Bag -->
+    <circle cx="80" cy="130" r="28" fill="#1e293b" />
+    <polygon points="80,112 94,136 66,136" fill="#06b6d4" />
+    <circle cx="80" cy="126" r="5" fill="#f8fafc" />
+    
+    <text x="80" y="172" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="900" font-size="12" fill="#0f172a" letter-spacing="1">PRINTEZYOUR</text>
+    <text x="80" y="184" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="7" fill="#475569" letter-spacing="2">ECO KRAFT PACKAGING</text>
+
+    <!-- Bottom fold scoreline -->
+    <line x1="15" y1="205" x2="145" y2="205" stroke="#9a7342" stroke-width="1" opacity="0.5" />
+    <polygon points="15,205 35,230 15,230" fill="#8c6534" opacity="0.5" />
+  </g>
+</svg>

@@ -448,6 +448,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
               {currentTab === 'orders' && hasPermission('orders.view') && (
                 <AdminOrders
                   orders={orders}
+                  settings={settings}
                   onOrderUpdated={fetchAllAdminData}
                   selectedOrderId={selectedOrderId}
                 />

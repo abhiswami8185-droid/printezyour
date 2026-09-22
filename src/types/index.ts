@@ -119,6 +119,7 @@ export interface Category {
   description: string;
   icon?: string;
   imageUrl?: string;
+  image?: string;
   displayOrder: number;
   active: boolean;
 }

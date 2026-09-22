@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg11" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+    <linearGradient id="polyBag" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e2e8f0" />
+      <stop offset="100%" stop-color="#cbd5e1" />
+    </linearGradient>
+    <filter id="packShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="10" flood-color="#000" flood-opacity="0.45" />
+    </filter>
+  </defs>
+
+  <rect width="400" height="300" fill="url(#bg11)" />
+
+  <!-- Roll of Branded Packaging BOPP Tape (Left Background) -->
+  <g transform="translate(65, 80)" filter="url(#packShadow)">
+    <ellipse cx="45" cy="80" rx="35" ry="50" fill="#9a7342" stroke="#6b4c24" stroke-width="2" />
+    <ellipse cx="45" cy="80" rx="20" ry="32" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" />
+    <ellipse cx="45" cy="80" rx="15" ry="24" fill="#0f172a" />
+    <!-- Tape unwound strip -->
+    <path d="M 45 30 L 150 15 L 150 40 L 45 55 Z" fill="#d4b07d" opacity="0.9" />
+    <text x="95" y="32" transform="rotate(-6 95 32)" font-family="system-ui, sans-serif" font-weight="900" font-size="7" fill="#0f172a">FRAGILE · HANDLE WITH CARE</text>
+  </g>
+
+  <!-- Tamper-Proof Poly Courier Bag (Right Hero) -->
+  <g transform="translate(150, 45)" filter="url(#packShadow)">
+    <rect width="180" height="210" rx="10" fill="url(#polyBag)" stroke="#94a3b8" stroke-width="1.5" />
+    
+    <!-- Self-Adhesive Tamper Flap -->
+    <path d="M 0 35 L 180 35 L 180 0 L 0 0 Z" fill="#94a3b8" />
+    <rect x="15" y="10" width="150" height="15" fill="#ef4444" rx="2" />
+    <text x="90" y="21" text-anchor="middle" font-family="system-ui" font-weight="900" font-size="6.5" fill="#ffffff" letter-spacing="1">TAMPER PROOF SECURITY SEAL</text>
+
+    <!-- Shipping Courier Barcode Label Attached -->
+    <rect x="25" y="60" width="130" height="90" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1" />
+    <text x="35" y="78" font-family="system-ui, sans-serif" font-weight="900" font-size="10" fill="#0f172a">SHIP TO: EXPRESS</text>
+    <rect x="35" y="85" width="110" height="2" fill="#e2e8f0" />
+    
+    <!-- Barcode strips -->
+    <path d="M 35 95 h2 v30 h-2 z M 39 95 h3 v30 h-3 z M 44 95 h1 v30 h-1 z M 47 95 h4 v30 h-4 z M 53 95 h2 v30 h-2 z M 57 95 h1 v30 h-1 z M 60 95 h3 v30 h-3 z M 65 95 h2 v30 h-2 z M 69 95 h4 v30 h-4 z M 75 95 h1 v30 h-1 z M 78 95 h3 v30 h-3 z M 83 95 h2 v30 h-2 z M 87 95 h1 v30 h-1 z M 90 95 h3 v30 h-3 z M 95 95 h2 v30 h-2 z M 99 95 h4 v30 h-4 z M 105 95 h1 v30 h-1 z M 108 95 h3 v30 h-3 z M 113 95 h2 v30 h-2 z M 117 95 h4 v30 h-4 z M 123 95 h2 v30 h-2 z M 127 95 h3 v30 h-3 z M 132 95 h2 v30 h-2 z" fill="#0f172a" />
+    <text x="90" y="137" text-anchor="middle" font-family="monospace" font-size="6" fill="#64748b">TRK# 9897855704IN</text>
+
+    <!-- PrintezYour Packaging Pod Monogram -->
+    <circle cx="90" cy="180" r="16" fill="#0284c7" />
+    <text x="90" y="184" text-anchor="middle" font-family="system-ui" font-weight="bold" font-size="9" fill="#ffffff">PZ</text>
+  </g>
+</svg>

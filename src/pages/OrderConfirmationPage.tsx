@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   CheckCircle2,
   MessageSquare,
@@ -7,9 +7,13 @@ import {
   ArrowRight,
   ShieldCheck,
   Calendar,
-  FileCheck
+  FileCheck,
+  Receipt,
+  Download
 } from 'lucide-react';
-import { Order } from '../types';
+import { Order, BusinessSettings } from '../types';
+import { api } from '../services/api';
+import { BillingModal } from '../components/billing/BillingModal';
 
 interface OrderConfirmationPageProps {
   order: Order;
@@ -22,6 +26,13 @@ export const OrderConfirmationPage: React.FC<OrderConfirmationPageProps> = ({
   whatsappData,
   onNavigate
 }) => {
+  const [showBillingModal, setShowBillingModal] = useState(false);
+  const [settings, setSettings] = useState<BusinessSettings | null>(null);
+
+  useEffect(() => {
+    api.getSettings().then(setSettings).catch(() => {});
+  }, []);
+
   const waLink = whatsappData?.waLink || `https://wa.me/918557049897?text=Hello%20Printezyour%2C%20I%20placed%20Order%20${order.id}.%20Please%20confirm%20artwork.`;
 
   const handlePrint = () => {
@@ -88,13 +99,23 @@ export const OrderConfirmationPage: React.FC<OrderConfirmationPageProps> = ({
             <div className="font-bold text-sm text-slate-900">Tax Invoice & Order Slip</div>
             <div className="text-[11px] text-slate-500">PrintezYour Commercial Printing Hub</div>
           </div>
-          <button
-            onClick={handlePrint}
-            className="print:hidden text-xs flex items-center gap-1.5 text-blue-700 hover:text-blue-800 font-semibold"
-          >
-            <Printer className="w-3.5 h-3.5" />
-            <span>Print Invoice</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowBillingModal(true)}
+              className="print:hidden text-xs flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white font-bold transition-all shadow-xs border border-blue-200"
+              title="Open full statutory GST or Non-GST invoice generator"
+            >
+              <Receipt className="w-3.5 h-3.5" />
+              <span>GST / Non-GST Invoice</span>
+            </button>
+            <button
+              onClick={handlePrint}
+              className="print:hidden text-xs flex items-center gap-1.5 text-slate-600 hover:text-slate-900 font-semibold px-2 py-1"
+            >
+              <Printer className="w-3.5 h-3.5" />
+              <span>Print</span>
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4 text-xs text-slate-600">
@@ -175,6 +196,15 @@ export const OrderConfirmationPage: React.FC<OrderConfirmationPageProps> = ({
           &larr; Back to PrintezYour Homepage
         </button>
       </div>
+
+      {/* Production Billing Modal */}
+      {showBillingModal && (
+        <BillingModal
+          order={order}
+          settings={settings}
+          onClose={() => setShowBillingModal(false)}
+        />
+      )}
     </div>
   );
 };
