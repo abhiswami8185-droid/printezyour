@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      // Suppress benign Vite WebSocket HMR disconnection in sandbox iframe where HMR is disabled
+      window.addEventListener('unhandledrejection', function (e) {
+        var msg = e.reason && (e.reason.message || String(e.reason));
+        if (msg && msg.indexOf('WebSocket') !== -1) {
+          e.preventDefault();
+        }
+      });
+      var _origErr = console.error;
+      console.error = function () {
+        var str = Array.prototype.slice.call(arguments).join(' ');
+        if (str.indexOf('failed to connect to websocket') !== -1 || str.indexOf('WebSocket closed without opened') !== -1) {
+          return;
+        }
+        _origErr.apply(console, arguments);
+      };
+      var _origDbg = console.debug;
+      console.debug = function () {
+        var str = Array.prototype.slice.call(arguments).join(' ');
+        if (str.indexOf('[vite]') !== -1) {
+          return;
+        }
+        _origDbg.apply(console, arguments);
+      };
+    </script>
+    <link rel="icon" type="image/svg+xml" href="./logo-icon.svg" />
+    <link rel="alternate icon" type="image/png" href="./logo.png" />
+    <title>PrintezYour - Modern Printing & E-Commerce System</title>
+    <meta name="description" content="Official website, online custom printing ordering system, and business management portal for PrintezYour (Chandigarh)." />
+    <meta property="og:title" content="PrintezYour - Modern Printing & E-Commerce System" />
+    <meta property="og:description" content="Official website, online custom printing ordering system, and business management portal for PrintezYour (Chandigarh)." />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_IN" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "PrintezYour",
+      "image": "/logo.png",
+      "telephone": "+918557049897",
+      "email": "printezyour@gmail.com",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Plot No 1794, Gym Deep Complex, Hallo Majra, Near Urban Akhada",
+        "addressLocality": "Chandigarh",
+        "postalCode": "160002",
+        "addressCountry": "IN"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 30.7046,
+        "longitude": 76.7985
+      },
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+          "opens": "09:00",
+          "closes": "19:00"
+        },
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Saturday"],
+          "opens": "10:00",
+          "closes": "18:00"
+        }
+      ],
+      "priceRange": "₹₹",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "reviewCount": "120"
+      }
+    }
+    </script>
+    <script type="module" crossorigin src="/printezyour/assets/index-BMkl8zqU.js"></script>
+    <link rel="modulepreload" crossorigin href="/printezyour/assets/vendor-react-BQ1FuAAx.js">
+    <link rel="modulepreload" crossorigin href="/printezyour/assets/vendor-jspdf-bhtogxAa.js">
+    <link rel="modulepreload" crossorigin href="/printezyour/assets/vendor-icons-kdxLrO39.js">
+    <link rel="modulepreload" crossorigin href="/printezyour/assets/vendor-motion-CMUGuxHB.js">
+    <link rel="stylesheet" crossorigin href="/printezyour/assets/index-BtKUC5h2.css">
+  </head>
+  <body class="bg-slate-50 text-slate-900 font-sans antialiased selection:bg-cyan-500 selection:text-white">
+    <div id="root"></div>
+    <script>
+      // Diagnostic check: Detect if unbundled source index.html is being statically served on GitHub Pages
+      if (window.location.hostname.endsWith('.github.io')) {
+        window.addEventListener('load', function() {
+          setTimeout(function() {
+            var root = document.getElementById('root');
+            if (root && root.children.length === 0) {
+              var notice = document.createElement('div');
+              notice.style.cssText = 'position:fixed;inset:0;background:#0f172a;color:#f8fafc;display:flex;align-items:center;justify-content:center;font-family:system-ui,-apple-system,sans-serif;padding:24px;z-index:99999;';
+              notice.innerHTML = '<div style="max-width:540px;background:#1e293b;border:1px solid #334155;border-radius:16px;padding:32px;text-align:center;box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">' +
+                '<div style="width:48px;height:48px;background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.3);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px auto;color:#38bdf8;font-size:24px;">&#9881;</div>' +
+                '<h2 style="font-size:18px;font-weight:700;color:#f8fafc;margin:0 0 12px 0;">GitHub Pages Configuration Step Required</h2>' +
+                '<p style="color:#94a3b8;font-size:13px;line-height:1.6;margin:0 0 20px 0;">' +
+                'This repository uses <b>GitHub Actions</b> to build the static production site into <code>dist/</code>.<br><br>' +
+                'GitHub Pages is currently serving uncompiled source files directly from the branch root.<br><br>' +
+                'To resolve this immediately:<br>' +
+                '1. Go to repository <b>Settings &rarr; Pages</b><br>' +
+                '2. Under <b>Build and deployment &rarr; Source</b>, select <b>GitHub Actions</b>.' +
+                '</p>' +
+                '<a href="https://github.com/abhiswami8185-droid/printezyour/settings/pages" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#0284c7;color:#ffffff;font-size:13px;font-weight:600;padding:10px 20px;border-radius:8px;text-decoration:none;">Open GitHub Pages Settings &rarr;</a>' +
+                '</div>';
+              document.body.appendChild(notice);
+            }
+          }, 2000);
+        });
+      }
+    </script>
+  </body>
+</html>
+

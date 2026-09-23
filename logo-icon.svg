@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 250" width="100%" height="100%" fill="none">
+  <defs>
+    <linearGradient id="pzIconBody" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#323842" />
+      <stop offset="35%" stop-color="#242930" />
+      <stop offset="85%" stop-color="#181c22" />
+      <stop offset="100%" stop-color="#0f1216" />
+    </linearGradient>
+
+    <linearGradient id="pzIconTopTray" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3c4450" />
+      <stop offset="50%" stop-color="#282e37" />
+      <stop offset="100%" stop-color="#1a1e24" />
+    </linearGradient>
+
+    <linearGradient id="pzIconElectricCyan" x1="0%" y1="0%" x2="100%" y2="80%">
+      <stop offset="0%" stop-color="#00c8ff" />
+      <stop offset="30%" stop-color="#009df8" />
+      <stop offset="70%" stop-color="#0080ea" />
+      <stop offset="100%" stop-color="#0062d6" />
+    </linearGradient>
+
+    <linearGradient id="pzIconElectricBase" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#009df8" />
+      <stop offset="50%" stop-color="#007fe8" />
+      <stop offset="100%" stop-color="#005ec4" />
+    </linearGradient>
+
+    <linearGradient id="pzIconSpecular" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.85" />
+      <stop offset="40%" stop-color="#70d8ff" stop-opacity="0.5" />
+      <stop offset="100%" stop-color="#0080ea" stop-opacity="0" />
+    </linearGradient>
+
+    <filter id="pzIconShadow" x="-20%" y="-20%" width="140%" height="145%">
+      <feDropShadow dx="1" dy="6" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.25" />
+    </filter>
+
+    <radialGradient id="pzIconFloorShadow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0f172a" stop-opacity="0.32" />
+      <stop offset="60%" stop-color="#0f172a" stop-opacity="0.12" />
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Ambient Floor Shadow -->
+  <ellipse cx="125" cy="226" rx="112" ry="15" fill="url(#pzIconFloorShadow)" />
+
+  <g filter="url(#pzIconShadow)" transform="translate(6, 4)">
+    <!-- Top Paper Tray -->
+    <rect x="74" y="36" width="102" height="34" rx="8" fill="url(#pzIconTopTray)" stroke="#4a5360" stroke-width="1.2" />
+    <rect x="86" y="28" width="78" height="12" rx="3" fill="#e2e8f0" opacity="0.95" />
+    <line x1="94" y1="33" x2="156" y2="33" stroke="#cbd5e1" stroke-width="1.5" />
+
+    <!-- Main Printer Chassis Body -->
+    <path d="M 44 68 
+             C 44 62, 50 56, 58 56 
+             L 194 56 
+             C 202 56, 208 62, 208 68 
+             L 208 172 
+             C 208 178, 202 184, 194 184 
+             L 182 184 
+             L 182 196 
+             C 182 201, 177 205, 171 205 
+             L 155 205 
+             C 150 205, 146 201, 146 196 
+             L 146 184 
+             L 44 184 
+             Z" 
+          fill="url(#pzIconBody)" 
+          stroke="#3a424e" 
+          stroke-width="1.5" />
+
+    <!-- Top Specular Highlight Edge -->
+    <path d="M 58 58 L 194 58" stroke="#566273" stroke-width="1.8" stroke-linecap="round" />
+
+    <!-- Status Sensor -->
+    <circle cx="62" cy="98" r="6" fill="#12151a" stroke="#363e4a" stroke-width="1" />
+    <circle cx="62" cy="98" r="2.8" fill="#00d2ff" opacity="0.9" />
+
+    <!-- Paper Output Slot Mouth -->
+    <path d="M 52 136 L 198 136 C 200 136, 202 138, 202 140 L 202 152 C 202 154, 200 156, 198 156 L 52 156 C 50 156, 48 154, 48 152 L 48 140 C 48 138, 50 136, 52 136 Z" 
+          fill="#0b0d10" />
+
+    <!-- Lower Output Tray Block (Glossy Electric Blue Solid 3D Base) -->
+    <rect x="76" y="152" width="108" height="42" rx="9" fill="url(#pzIconElectricBase)" stroke="#45b8ff" stroke-width="1.2" />
+    <path d="M 82 154 L 178 154" stroke="#8ae0ff" stroke-width="2" stroke-linecap="round" />
+
+    <!-- DYNAMIC 3D ELECTRIC CYAN/BLUE SWOOSH -->
+    <path d="M 194 38
+             C 214 62, 218 96, 204 126
+             C 192 152, 164 168, 126 178
+             C 84 188, 42 190, 24 204
+             C 18 208, 15 214, 18 220
+             C 20 223, 25 224, 30 221
+             C 56 206, 92 195, 134 184
+             C 176 174, 214 150, 226 112
+             C 234 84, 228 54, 194 38 Z"
+          fill="url(#pzIconElectricCyan)" />
+
+    <path d="M 192 46
+             C 210 68, 215 98, 202 124
+             C 188 150, 158 168, 118 178
+             C 78 188, 44 196, 26 208"
+          fill="none"
+          stroke="url(#pzIconSpecular)"
+          stroke-width="3.2"
+          stroke-linecap="round" />
+  </g>
+</svg>
