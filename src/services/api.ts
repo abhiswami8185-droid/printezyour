@@ -158,12 +158,46 @@ export const getApiUrl = (endpoint: string): string => {
   return cleanEndpoint;
 };
 
+type SessionExpiredHandler = (message: string) => void;
+const sessionExpiredHandlers = new Set<SessionExpiredHandler>();
+
+export const onSessionExpired = (handler: SessionExpiredHandler) => {
+  sessionExpiredHandlers.add(handler);
+  return () => {
+    sessionExpiredHandlers.delete(handler);
+  };
+};
+
+export const triggerSessionExpired = (message: string = 'Your admin session expired due to inactivity. Please log in again.') => {
+  sessionExpiredHandlers.forEach(handler => {
+    try {
+      handler(message);
+    } catch {
+      // ignore
+    }
+  });
+};
+
 const apiFetch = async (url: string, init?: RequestInit): Promise<Response> => {
   const resolvedUrl = getApiUrl(url);
   const cleanEndpoint = url.startsWith('/') ? url : ('/' + url);
 
   try {
     const res = await fetch(resolvedUrl, init);
+
+    // Check for session expiration on authenticated endpoints
+    if (res.status === 401 && !cleanEndpoint.includes('/api/auth/login')) {
+      try {
+        const cloned = res.clone();
+        const data = await cloned.json();
+        if (data && data.code === 'SESSION_EXPIRED') {
+          triggerSessionExpired(data.error || 'Your admin session expired due to inactivity. Please log in again.');
+        }
+      } catch {
+        // ignore json parse error
+      }
+    }
+
     // If an external endpoint returns 5xx server error, try fallback to relative (only if not static host)
     if (!res.ok && resolvedUrl !== cleanEndpoint && res.status >= 500) {
       const isStaticHost = typeof window !== 'undefined' && window.location.hostname.endsWith('.github.io');
@@ -232,21 +266,34 @@ export const api = {
     if (data.token) {
       setAuthToken(data.token);
     }
-    return data as { success: boolean; user: User; token: string };
+    return data as { success: boolean; user: User; token: string; expiresAt?: number; timeoutMinutes?: number };
   },
 
-  async logout() {
+  async extendSession(): Promise<{ success: boolean; expiresAt?: number; user?: User }> {
+    const res = await apiFetch('/api/auth/extend-session', {
+      method: 'POST',
+      headers: getHeaders()
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Failed to extend session');
+    }
+    return res.json();
+  },
+
+  async logout(reason: 'USER_LOGOUT' | 'SESSION_EXPIRED' = 'USER_LOGOUT') {
     try {
       await apiFetch('/api/auth/logout', {
         method: 'POST',
-        headers: getHeaders()
+        headers: getHeaders(),
+        body: JSON.stringify({ reason })
       });
     } finally {
       setAuthToken('');
     }
   },
 
-  async getMe(): Promise<{ user: User }> {
+  async getMe(): Promise<{ user: User; expiresAt?: number }> {
     const res = await apiFetch('/api/auth/me', {
       headers: getHeaders()
     });

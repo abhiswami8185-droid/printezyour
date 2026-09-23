@@ -17,6 +17,16 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, onExit }) => 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showForgotModal, setShowForgotModal] = useState(false);
+  const [expiredNotice, setExpiredNotice] = useState<string | null>(() => {
+    try {
+      const notice = sessionStorage.getItem('printezyour_session_expired_notice');
+      if (notice) {
+        sessionStorage.removeItem('printezyour_session_expired_notice');
+        return notice;
+      }
+    } catch {}
+    return null;
+  });
 
   // Production Backend Server Status & Diagnostics
   const [activeBaseUrl, setActiveBaseUrl] = useState(() => getActiveApiBaseUrl());
@@ -148,6 +158,14 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, onExit }) => 
               </p>
             </div>
           </div>
+
+          {/* Session Expired Notice */}
+          {expiredNotice && (
+            <div className="mt-5 p-3.5 rounded-xl bg-amber-950/70 border border-amber-600/80 text-amber-200 text-xs flex items-start gap-2.5 animate-in fade-in duration-200">
+              <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+              <div className="leading-relaxed font-medium">{expiredNotice}</div>
+            </div>
+          )}
 
           {/* Error Notice */}
           {error && (

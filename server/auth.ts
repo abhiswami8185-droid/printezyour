@@ -22,19 +22,30 @@ export function verifyPassword(password: string, combinedHash: string): boolean 
   }
 }
 
-// Session Token Manager with Persistent Storage
-interface ActiveSession {
+// Session Token Manager with Persistent Storage and Sliding Inactivity Timeout
+export interface ActiveSession {
   token: string;
   userId: string;
   createdAt: number;
+  lastActivityAt: number;
   expiresAt: number;
+  timeoutMinutes: number;
+}
+
+export interface SessionValidationResult {
+  valid: boolean;
+  userId?: string;
+  expiresAt?: number;
+  timeoutMinutes?: number;
+  reason?: 'EXPIRED' | 'INVALID';
 }
 
 const DATA_DIR = path.join(process.cwd(), 'data');
 const SESSIONS_FILE = path.join(DATA_DIR, 'sessions.json');
 
-class SessionManager {
+export class SessionManager {
   private sessions = new Map<string, ActiveSession>();
+  private saveTimeout: NodeJS.Timeout | null = null;
 
   constructor() {
     this.loadSessions();
@@ -52,7 +63,11 @@ class SessionManager {
         if (Array.isArray(list)) {
           for (const s of list) {
             if (s && s.token && s.userId && s.expiresAt > now) {
-              this.sessions.set(s.token, s);
+              this.sessions.set(s.token, {
+                ...s,
+                lastActivityAt: s.lastActivityAt || s.createdAt || now,
+                timeoutMinutes: s.timeoutMinutes && s.timeoutMinutes > 0 ? s.timeoutMinutes : 30
+              });
             }
           }
         }
@@ -62,7 +77,7 @@ class SessionManager {
     }
   }
 
-  private persistSessions() {
+  public persistSessions() {
     try {
       if (!fs.existsSync(DATA_DIR)) {
         fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -80,36 +95,76 @@ class SessionManager {
     }
   }
 
-  public createSession(userId: string): string {
+  public persistSessionsDebounced() {
+    if (this.saveTimeout) return;
+    this.saveTimeout = setTimeout(() => {
+      this.saveTimeout = null;
+      this.persistSessions();
+    }, 500);
+  }
+
+  public createSession(userId: string, timeoutMinutes: number = 30): ActiveSession {
     const token = `pz_sec_${crypto.randomBytes(32).toString('hex')}_${Date.now()}`;
     const now = Date.now();
-    const expiresAt = now + 7 * 24 * 60 * 60 * 1000; // 7 days expiration
+    const safeMinutes = typeof timeoutMinutes === 'number' && timeoutMinutes >= 1 && timeoutMinutes <= 1440
+      ? Math.floor(timeoutMinutes)
+      : 30;
+    const expiresAt = now + safeMinutes * 60 * 1000;
     const session: ActiveSession = {
       token,
       userId,
       createdAt: now,
-      expiresAt
+      lastActivityAt: now,
+      expiresAt,
+      timeoutMinutes: safeMinutes
     };
     this.sessions.set(token, session);
     this.persistSessions();
-    return token;
+    return session;
   }
 
-  public validateSession(token: string): string | null {
-    if (!token || typeof token !== 'string') return null;
+  public validateSessionWithDetails(token: string, touch: boolean = true): SessionValidationResult {
+    if (!token || typeof token !== 'string') {
+      return { valid: false, reason: 'INVALID' };
+    }
 
     const session = this.sessions.get(token);
     if (!session) {
-      return null;
+      return { valid: false, reason: 'INVALID' };
     }
 
-    if (Date.now() > session.expiresAt) {
+    const now = Date.now();
+    if (now > session.expiresAt) {
       this.sessions.delete(token);
       this.persistSessions();
-      return null;
+      return { valid: false, reason: 'EXPIRED' };
     }
 
-    return session.userId;
+    if (touch) {
+      session.lastActivityAt = now;
+      session.expiresAt = now + session.timeoutMinutes * 60 * 1000;
+      this.persistSessionsDebounced();
+    }
+
+    return {
+      valid: true,
+      userId: session.userId,
+      expiresAt: session.expiresAt,
+      timeoutMinutes: session.timeoutMinutes
+    };
+  }
+
+  public extendSession(token: string): SessionValidationResult {
+    return this.validateSessionWithDetails(token, true);
+  }
+
+  public validateSession(token: string): string | null {
+    const result = this.validateSessionWithDetails(token, true);
+    return result.valid && result.userId ? result.userId : null;
+  }
+
+  public getSession(token: string): ActiveSession | undefined {
+    return this.sessions.get(token);
   }
 
   public revokeSession(token: string): void {
@@ -120,14 +175,22 @@ class SessionManager {
   }
 }
 
-const sessionManager = new SessionManager();
+export const sessionManager = new SessionManager();
 
-export function generateToken(userId: string): string {
-  return sessionManager.createSession(userId);
+export function generateToken(userId: string, timeoutMinutes: number = 30): ActiveSession {
+  return sessionManager.createSession(userId, timeoutMinutes);
 }
 
 export function validateSessionToken(token: string): string | null {
   return sessionManager.validateSession(token);
+}
+
+export function validateSessionWithDetails(token: string, touch: boolean = true): SessionValidationResult {
+  return sessionManager.validateSessionWithDetails(token, touch);
+}
+
+export function extendSessionToken(token: string): SessionValidationResult {
+  return sessionManager.extendSession(token);
 }
 
 export function revokeSessionToken(token: string): void {

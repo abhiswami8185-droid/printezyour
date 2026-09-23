@@ -206,6 +206,39 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ settings, onSettin
           </div>
         </div>
 
+        {/* Security & Administrative Session Policy */}
+        <div className="space-y-4 pt-4">
+          <h3 className="font-bold text-xs uppercase tracking-wider text-slate-700 border-b pb-2 flex items-center gap-1.5">
+            <ShieldCheck className="w-4 h-4 text-emerald-700" />
+            <span>4. Administrative Security & Session Expiration</span>
+          </h3>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block font-semibold text-slate-700 mb-1">
+                Admin Session Inactivity Timeout
+              </label>
+              <select
+                value={formData.adminSessionTimeoutMinutes ?? 30}
+                onChange={e => setFormData({ ...formData, adminSessionTimeoutMinutes: Number(e.target.value) })}
+                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg font-semibold text-slate-800 focus:ring-2 focus:ring-blue-500 cursor-pointer"
+              >
+                <option value={5}>5 minutes</option>
+                <option value={10}>10 minutes</option>
+                <option value={15}>15 minutes</option>
+                <option value={30}>30 minutes (Standard / Default)</option>
+                <option value={45}>45 minutes</option>
+                <option value={60}>60 minutes (1 hour)</option>
+                <option value={90}>90 minutes (1.5 hours)</option>
+                <option value={120}>120 minutes (2 hours)</option>
+              </select>
+              <p className="text-[11px] text-slate-500 mt-1.5">
+                Automatically terminates the administrative console session if no qualifying interaction (mouse movement, clicks, keyboard input, touch, or navigation) occurs within this duration.
+              </p>
+            </div>
+          </div>
+        </div>
+
         <div className="pt-4 border-t flex justify-end">
           <button
             type="submit"

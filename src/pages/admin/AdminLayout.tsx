@@ -16,7 +16,8 @@ import {
   X,
   UserCheck,
   Activity,
-  LogOut
+  LogOut,
+  AlertTriangle
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
@@ -60,11 +61,40 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   initialTab = 'dashboard',
   targetOrderId
 }) => {
-  const { user, role, roleName, isAuthenticated, isLoading, hasPermission, logout } = useAuth();
+  const {
+    user,
+    role,
+    roleName,
+    isAuthenticated,
+    isLoading,
+    hasActiveAdminSession,
+    secondsRemaining,
+    isExpiringSoon,
+    extendSession,
+    hasPermission,
+    logout,
+    exitAdminSession
+  } = useAuth();
   const [currentTab, setCurrentTab] = useState<string>(initialTab);
   const [selectedOrderId, setSelectedOrderId] = useState<string | undefined>(targetOrderId);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+
+  const handleExitAdmin = () => {
+    exitAdminSession();
+    onExitAdmin();
+  };
+
+  const formatRemainingTime = (totalSeconds: number) => {
+    if (totalSeconds <= 0) return '00:00';
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    if (hours > 0) {
+      return `${hours}:${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }
+    return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  };
 
   // Synchronize initialTab with permission verification
   useEffect(() => {
@@ -247,8 +277,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     );
   }
 
-  if (!isAuthenticated || !user) {
-    return <AdminLogin onSuccess={fetchAllAdminData} onExit={onExitAdmin} />;
+  if (!hasActiveAdminSession || !isAuthenticated || !user) {
+    return <AdminLogin onSuccess={fetchAllAdminData} onExit={handleExitAdmin} />;
   }
 
   return (
@@ -339,7 +369,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
             <span>Change Password</span>
           </button>
           <button
-            onClick={onExitAdmin}
+            onClick={handleExitAdmin}
             className="w-full flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -367,7 +397,23 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            {/* Live Inactivity Session Countdown Timer */}
+            {isAuthenticated && (
+              <div
+                className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                  isExpiringSoon
+                    ? 'bg-rose-50 border-rose-300 text-rose-700 animate-pulse font-bold'
+                    : 'bg-slate-100/90 border-slate-200 text-slate-700'
+                }`}
+                title="Active administrative session countdown. Automatically terminates on inactivity."
+              >
+                <Clock className={`w-3.5 h-3.5 ${isExpiringSoon ? 'text-rose-600' : 'text-blue-600'} shrink-0`} />
+                <span className="hidden sm:inline">Session expires in</span>
+                <strong className="font-mono">{formatRemainingTime(secondsRemaining)}</strong>
+              </div>
+            )}
+
             {/* Authenticated user session info */}
             <div className="hidden md:flex items-center gap-2 bg-slate-100/90 border border-slate-200/80 px-3 py-1.5 rounded-xl text-xs">
               <Shield className="w-3.5 h-3.5 text-blue-600 shrink-0" />
@@ -379,23 +425,23 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 
             <button
               onClick={() => setShowPasswordModal(true)}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-700 hover:text-blue-700 bg-slate-100 hover:bg-slate-200/80 rounded-xl border border-slate-300 transition-colors"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-700 hover:text-blue-700 bg-slate-100 hover:bg-slate-200/80 rounded-xl border border-slate-300 transition-colors cursor-pointer"
             >
               <KeyRound className="w-3.5 h-3.5 text-slate-500" />
               <span>Change Password</span>
             </button>
 
             <button
-              onClick={logout}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-rose-700 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 rounded-xl border border-rose-200 transition-colors"
+              onClick={() => logout('USER_LOGOUT')}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-rose-700 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 rounded-xl border border-rose-200 transition-colors cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Sign Out</span>
             </button>
 
             <button
-              onClick={onExitAdmin}
-              className="lg:hidden text-xs font-bold text-blue-700 bg-blue-50 px-3 py-1.5 rounded-lg"
+              onClick={handleExitAdmin}
+              className="lg:hidden text-xs font-bold text-blue-700 bg-blue-50 px-3 py-1.5 rounded-lg cursor-pointer"
             >
               Exit
             </button>
@@ -499,6 +545,40 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
           )}
         </main>
       </div>
+
+      {/* 5-Minute Inactivity Session Expiry Warning Modal */}
+      {isExpiringSoon && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4 text-center animate-in zoom-in-95 duration-150">
+            <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-600 mx-auto flex items-center justify-center">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+            <h3 className="text-base sm:text-lg font-bold text-slate-900">
+              Administrative Session Expiring
+            </h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Your administrative session will automatically terminate in <strong className="font-mono text-amber-700 font-bold text-sm">{formatRemainingTime(secondsRemaining)}</strong> due to inactivity.
+              Would you like to extend your session and continue working?
+            </p>
+            <div className="pt-2 flex items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => logout('USER_LOGOUT')}
+                className="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs font-bold transition-colors cursor-pointer"
+              >
+                Logout Now
+              </button>
+              <button
+                type="button"
+                onClick={extendSession}
+                className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors shadow-sm cursor-pointer"
+              >
+                Continue Session
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

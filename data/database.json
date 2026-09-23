@@ -2209,7 +2209,8 @@
     "freeDeliveryThreshold": 2000,
     "upiId": "8557049897@okbizaxis",
     "enableWhatsAppNotifications": true,
-    "whatsappApiKey": ""
+    "whatsappApiKey": "",
+    "adminSessionTimeoutMinutes": 30
   },
   "roles": [
     {

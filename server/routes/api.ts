@@ -8,6 +8,8 @@ import { PermissionKey, User } from '../../src/types';
 import {
   generateToken,
   validateSessionToken,
+  validateSessionWithDetails,
+  extendSessionToken,
   revokeSessionToken,
   verifyPassword,
   ALL_PERMISSIONS
@@ -58,9 +60,11 @@ const upload = multer({
 // AUTHENTICATION & AUTHORIZATION MIDDLEWARE
 // ----------------------------------------------------
 
-// Extend Express Request type with authUser
+// Extend Express Request type with authUser and session data
 export interface AuthenticatedRequest extends express.Request {
   authUser?: User & { isSuperAdmin: boolean };
+  sessionToken?: string;
+  sessionExpiresAt?: number;
 }
 
 export const authenticateToken = (
@@ -78,13 +82,23 @@ export const authenticateToken = (
     return;
   }
 
-  const userId = validateSessionToken(token);
-  if (!userId) {
-    res.status(401).json({ error: 'Invalid or expired session. Please log in again.' });
+  const sessionResult = validateSessionWithDetails(token, true);
+  if (!sessionResult.valid) {
+    if (sessionResult.reason === 'EXPIRED') {
+      res.status(401).json({
+        error: 'Your admin session expired due to inactivity. Please log in again.',
+        code: 'SESSION_EXPIRED'
+      });
+      return;
+    }
+    res.status(401).json({
+      error: 'Invalid or expired session. Please log in again.',
+      code: 'INVALID_SESSION'
+    });
     return;
   }
 
-  const user = db.getUserById(userId);
+  const user = db.getUserById(sessionResult.userId!);
   if (!user) {
     res.status(401).json({ error: 'User account not found' });
     return;
@@ -95,10 +109,16 @@ export const authenticateToken = (
     return;
   }
 
+  if (sessionResult.expiresAt) {
+    res.setHeader('X-Session-Expires-At', String(sessionResult.expiresAt));
+  }
+
   req.authUser = {
     ...user,
     isSuperAdmin: user.role === 'SUPER_ADMIN' || user.role.toLowerCase() === 'owner'
   };
+  req.sessionToken = token;
+  req.sessionExpiresAt = sessionResult.expiresAt;
   next();
 };
 
@@ -172,7 +192,12 @@ apiRouter.post('/auth/login', (req, res) => {
     return;
   }
 
-  const token = generateToken(user.id);
+  const currentSettings = db.getSettings();
+  const configuredTimeout = typeof currentSettings.adminSessionTimeoutMinutes === 'number' && currentSettings.adminSessionTimeoutMinutes > 0
+    ? currentSettings.adminSessionTimeoutMinutes
+    : 30;
+
+  const session = generateToken(user.id, configuredTimeout);
   const { passwordHash: _, ...safeUser } = user;
 
   db.logAudit(
@@ -185,13 +210,24 @@ apiRouter.post('/auth/login', (req, res) => {
 
   res.json({
     success: true,
-    token,
+    token: session.token,
+    expiresAt: session.expiresAt,
+    timeoutMinutes: session.timeoutMinutes,
     user: safeUser
   });
 });
 
 apiRouter.get('/auth/me', authenticateToken, (req: AuthenticatedRequest, res) => {
   res.json({
+    user: req.authUser,
+    expiresAt: req.sessionExpiresAt
+  });
+});
+
+apiRouter.post('/auth/extend-session', authenticateToken, (req: AuthenticatedRequest, res) => {
+  res.json({
+    success: true,
+    expiresAt: req.sessionExpiresAt,
     user: req.authUser
   });
 });
@@ -201,7 +237,24 @@ apiRouter.post('/auth/logout', (req, res) => {
   const token = authHeader && authHeader.startsWith('Bearer ')
     ? authHeader.slice(7).trim()
     : (req.headers['x-admin-token'] as string | undefined)?.trim();
+  const reason = req.body?.reason || 'USER_LOGOUT';
+
   if (token) {
+    const sessionResult = validateSessionWithDetails(token, false);
+    if (sessionResult.userId) {
+      const user = db.getUserById(sessionResult.userId);
+      if (user) {
+        db.logAudit(
+          user.name,
+          user.role,
+          reason === 'SESSION_EXPIRED' ? 'SESSION_EXPIRED' : 'LOGOUT',
+          reason === 'SESSION_EXPIRED'
+            ? 'Administrative session automatically terminated due to inactivity'
+            : `Logged out from administrative console (${req.ip || 'web'})`,
+          { userId: user.id, targetType: 'User', targetId: user.id, ip: req.ip }
+        );
+      }
+    }
     revokeSessionToken(token);
   }
   res.json({ success: true, message: 'Logged out successfully' });
@@ -767,7 +820,32 @@ apiRouter.get('/settings', (req: AuthenticatedRequest, res) => {
 });
 
 apiRouter.put('/settings', requirePermission('settings.edit'), (req: AuthenticatedRequest, res) => {
-  const updated = db.updateSettings(req.body);
+  const previousSettings = db.getSettings();
+  const updates = { ...req.body };
+
+  if (updates.adminSessionTimeoutMinutes !== undefined) {
+    const parsed = Number(updates.adminSessionTimeoutMinutes);
+    if (isNaN(parsed) || parsed < 1 || parsed > 1440) {
+      updates.adminSessionTimeoutMinutes = 30;
+    } else {
+      updates.adminSessionTimeoutMinutes = Math.floor(parsed);
+    }
+    const oldVal = previousSettings.adminSessionTimeoutMinutes || 30;
+    if (oldVal !== updates.adminSessionTimeoutMinutes) {
+      db.logAudit(
+        req.authUser?.name || 'Super Admin',
+        req.authUser?.role || 'SUPER_ADMIN',
+        'SECURITY_SETTINGS_UPDATED',
+        `Admin session inactivity timeout changed from ${oldVal} to ${updates.adminSessionTimeoutMinutes} minutes`,
+        {
+          previousValue: String(oldVal),
+          newValue: String(updates.adminSessionTimeoutMinutes)
+        }
+      );
+    }
+  }
+
+  const updated = db.updateSettings(updates);
   db.logAudit(req.authUser?.name || 'Super Admin', req.authUser?.role || 'SUPER_ADMIN', 'UPDATE_SETTINGS', 'Business settings updated');
   res.json(updated);
 });

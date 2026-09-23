@@ -454,6 +454,7 @@ export interface BusinessSettings {
   upiId: string;
   enableWhatsAppNotifications: boolean;
   whatsappApiKey?: string;
+  adminSessionTimeoutMinutes?: number; // Inactivity timeout in minutes (default 30)
 }
 
 export interface AuditLog {
