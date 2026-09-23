@@ -132,6 +132,242 @@
     transform: translateY(2px);
     box-shadow: 0 1px 0 0 #0369a1, 0 2px 4px rgba(2, 132, 199, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
   }
+
+  /* ==========================================================================
+     PrintezYour Admin Panel 3D Tactile Buttons
+     ========================================================================== */
+
+  /* Admin Header Secondary Button (Change Password, Exit / Public Website, Actions) */
+  .admin-btn-3d-secondary {
+    @apply relative inline-flex items-center justify-center font-bold text-xs select-none cursor-pointer transition-all duration-150 text-slate-700 outline-none;
+    touch-action: manipulation;
+    border-radius: 0.75rem;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 3px 0 0 #94a3b8, 0 4px 6px -1px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  }
+  .admin-btn-3d-secondary:focus-visible {
+    @apply ring-2 ring-blue-500 ring-offset-2 ring-offset-white;
+  }
+  .admin-btn-3d-secondary:disabled {
+    @apply opacity-50 cursor-not-allowed pointer-events-none;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .admin-btn-3d-secondary:hover {
+      color: #0369a1;
+      background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+      border-color: #94a3b8;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 0 0 #94a3b8, 0 6px 12px -2px rgba(15, 23, 42, 0.12), inset 0 1px 0 #ffffff;
+    }
+  }
+  .admin-btn-3d-secondary:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 0 #94a3b8, 0 2px 4px rgba(15, 23, 42, 0.1), inset 0 1px 2px rgba(15, 23, 42, 0.06);
+    background: #f1f5f9;
+  }
+
+  /* Admin Header Primary Action Button (Prominent / Public Website Highlight) */
+  .admin-btn-3d-primary {
+    @apply relative inline-flex items-center justify-center font-bold text-xs select-none cursor-pointer transition-all duration-150 text-white outline-none;
+    touch-action: manipulation;
+    border-radius: 0.75rem;
+    background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
+    border: 1px solid #0284c7;
+    box-shadow: 0 3px 0 0 #075985, 0 4px 8px rgba(2, 132, 199, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+  .admin-btn-3d-primary:focus-visible {
+    @apply ring-2 ring-blue-500 ring-offset-2 ring-offset-white;
+  }
+  .admin-btn-3d-primary:disabled {
+    @apply opacity-50 cursor-not-allowed pointer-events-none;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .admin-btn-3d-primary:hover {
+      background: linear-gradient(180deg, #0369a1 0%, #075985 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 0 0 #075985, 0 7px 14px rgba(2, 132, 199, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    }
+  }
+  .admin-btn-3d-primary:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 0 #075985, 0 1px 3px rgba(2, 132, 199, 0.2), inset 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Admin Header Danger Button (Sign Out / Logout) */
+  .admin-btn-3d-danger {
+    @apply relative inline-flex items-center justify-center font-bold text-xs select-none cursor-pointer transition-all duration-150 text-rose-700 outline-none;
+    touch-action: manipulation;
+    border-radius: 0.75rem;
+    background: linear-gradient(180deg, #ffffff 0%, #fff1f2 100%);
+    border: 1px solid #fecdd3;
+    box-shadow: 0 3px 0 0 #fda4af, 0 4px 6px -1px rgba(225, 29, 72, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  }
+  .admin-btn-3d-danger:focus-visible {
+    @apply ring-2 ring-rose-500 ring-offset-2 ring-offset-white;
+  }
+  .admin-btn-3d-danger:disabled {
+    @apply opacity-50 cursor-not-allowed pointer-events-none;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .admin-btn-3d-danger:hover {
+      color: #9f1239;
+      background: linear-gradient(180deg, #fff1f2 0%, #ffe4e6 100%);
+      border-color: #fb7185;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 0 0 #fb7185, 0 6px 12px -2px rgba(225, 29, 72, 0.2), inset 0 1px 0 #ffffff;
+    }
+  }
+  .admin-btn-3d-danger:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 0 #fb7185, 0 1px 2px rgba(225, 29, 72, 0.15), inset 0 1px 2px rgba(190, 18, 60, 0.1);
+    background: #ffe4e6;
+  }
+
+  /* Admin Header Session Countdown Timer Button (Interactive Tactile Pill) */
+  .admin-btn-3d-timer {
+    @apply relative inline-flex items-center justify-center font-bold text-xs select-none cursor-pointer transition-all duration-150 text-slate-700 outline-none;
+    touch-action: manipulation;
+    border-radius: 0.75rem;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 2.5px 0 0 #94a3b8, 0 3px 6px -1px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  }
+  .admin-btn-3d-timer:focus-visible {
+    @apply ring-2 ring-blue-500 ring-offset-2 ring-offset-white;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .admin-btn-3d-timer:hover {
+      background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 3.5px 0 0 #94a3b8, 0 5px 10px rgba(15, 23, 42, 0.12), inset 0 1px 0 #ffffff;
+    }
+  }
+  .admin-btn-3d-timer:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 0 #94a3b8, 0 1px 2px rgba(15, 23, 42, 0.1), inset 0 1px 2px rgba(15, 23, 42, 0.06);
+    background: #f1f5f9;
+  }
+  .admin-btn-3d-timer-expiring {
+    background: linear-gradient(180deg, #fff1f2 0%, #ffe4e6 100%) !important;
+    border-color: #fda4af !important;
+    color: #be123c !important;
+    box-shadow: 0 2.5px 0 0 #f43f5e, 0 4px 8px rgba(225, 29, 72, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+  }
+
+  /* Admin Header Compact Icon Button (Mobile Menu, Drawer Close, etc.) */
+  .admin-btn-3d-icon {
+    @apply relative inline-flex items-center justify-center select-none cursor-pointer transition-all duration-150 text-slate-700 outline-none;
+    touch-action: manipulation;
+    border-radius: 0.75rem;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 2.5px 0 0 #94a3b8, 0 3px 6px -1px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  }
+  .admin-btn-3d-icon:focus-visible {
+    @apply ring-2 ring-blue-500 ring-offset-2 ring-offset-white;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .admin-btn-3d-icon:hover {
+      color: #0369a1;
+      background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+      border-color: #94a3b8;
+      transform: translateY(-1px);
+      box-shadow: 0 3.5px 0 0 #94a3b8, 0 5px 10px rgba(15, 23, 42, 0.12), inset 0 1px 0 #ffffff;
+    }
+  }
+  .admin-btn-3d-icon:active {
+    transform: translateY(2px);
+    box-shadow: 0 0.5px 0 0 #94a3b8, 0 1px 2px rgba(15, 23, 42, 0.1);
+    background: #f1f5f9;
+  }
+
+  /* Admin Dark Sidebar Navigation Buttons */
+  .admin-nav-3d-dark {
+    @apply relative flex items-center select-none cursor-pointer transition-all duration-150 outline-none;
+    touch-action: manipulation;
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid #334155;
+    box-shadow: 0 2.5px 0 0 #020617, 0 3px 6px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    border-radius: 0.75rem;
+    color: #94a3b8;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .admin-nav-3d-dark:hover {
+      color: #ffffff;
+      background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
+      border-color: #475569;
+      transform: translateY(-1px);
+      box-shadow: 0 3.5px 0 0 #020617, 0 5px 10px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    }
+  }
+  .admin-nav-3d-dark:active {
+    transform: translateY(2px);
+    box-shadow: 0 0.5px 0 0 #020617, 0 1px 2px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(0, 0, 0, 0.4);
+    background: #0b1120;
+  }
+  .admin-nav-3d-dark:focus-visible {
+    @apply ring-2 ring-cyan-400 ring-offset-2 ring-offset-slate-900;
+  }
+
+  /* Admin Dark Sidebar Active Selected Item */
+  .admin-nav-3d-dark-active {
+    @apply relative flex items-center select-none cursor-pointer transition-all duration-150 outline-none;
+    touch-action: manipulation;
+    background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
+    border: 1px solid #3b82f6;
+    box-shadow: 0 2.5px 0 0 #1e3a8a, 0 4px 10px rgba(37, 99, 235, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    border-radius: 0.75rem;
+    color: #ffffff;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .admin-nav-3d-dark-active:hover {
+      background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 3.5px 0 0 #1e3a8a, 0 6px 14px rgba(37, 99, 235, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+  }
+  .admin-nav-3d-dark-active:active {
+    transform: translateY(2px);
+    box-shadow: 0 0.5px 0 0 #1e3a8a, 0 1px 3px rgba(37, 99, 235, 0.25), inset 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+  .admin-nav-3d-dark-active:focus-visible {
+    @apply ring-2 ring-cyan-400 ring-offset-2 ring-offset-slate-900;
+  }
+
+  /* Admin Dark Icon Button (Profile Logout, Drawer Close) */
+  .admin-btn-3d-dark-icon {
+    @apply relative inline-flex items-center justify-center select-none cursor-pointer transition-all duration-150 outline-none;
+    touch-action: manipulation;
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid #334155;
+    box-shadow: 0 2px 0 0 #020617, 0 2px 4px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    border-radius: 0.5rem;
+    color: #94a3b8;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .admin-btn-3d-dark-icon:hover {
+      color: #ffffff;
+      background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
+      border-color: #475569;
+      transform: translateY(-1px);
+      box-shadow: 0 2.5px 0 0 #020617, 0 4px 6px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+  }
+  .admin-btn-3d-dark-icon:active {
+    transform: translateY(1.5px);
+    box-shadow: 0 0.5px 0 0 #020617, 0 1px 2px rgba(0, 0, 0, 0.25);
+    background: #0b1120;
+  }
+  .admin-btn-3d-dark-icon:focus-visible {
+    @apply ring-2 ring-cyan-400 ring-offset-1 ring-offset-slate-900;
+  }
 }
 
 /* Print Stylesheet for A4 GST & Non-GST Invoices */

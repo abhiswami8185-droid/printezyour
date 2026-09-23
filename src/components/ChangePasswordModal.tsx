@@ -159,14 +159,14 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors"
+              className="px-4 py-2 text-xs rounded-xl admin-nav-3d-dark text-slate-300 font-semibold"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-2 shadow-md transition-colors disabled:opacity-50"
+              className="admin-btn-3d-primary font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-2"
             >
               {loading ? 'Updating...' : 'Update Password'}
             </button>

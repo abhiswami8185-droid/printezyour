@@ -321,24 +321,23 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
           <button
             onClick={logout}
             title="Log Out"
-            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-700 transition-colors"
+            aria-label="Log out of administrative session"
+            className="admin-btn-3d-dark-icon p-2"
           >
             <LogOut className="w-3.5 h-3.5" />
           </button>
         </div>
 
         {/* Navigation List */}
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+        <nav className="flex-1 p-3 space-y-1.5 overflow-y-auto">
           {navItems.map(item => {
             const isActive = currentTab === item.id;
             return (
               <button
                 key={item.id}
                 onClick={() => handleNavigateTab(item.id)}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
-                  isActive
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold ${
+                  isActive ? 'admin-nav-3d-dark-active' : 'admin-nav-3d-dark'
                 }`}
               >
                 <div className="flex items-center gap-2.5">
@@ -347,7 +346,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                 </div>
                 {item.badge !== undefined && item.badge > 0 && (
                   <span
-                    className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full text-white ${
+                    className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full text-white shadow-xs ${
                       item.badgeColor || 'bg-pink-600'
                     }`}
                   >
@@ -363,14 +362,14 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
         <div className="p-3 border-t border-slate-800 space-y-2">
           <button
             onClick={() => setShowPasswordModal(true)}
-            className="w-full flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold admin-nav-3d-dark"
           >
             <KeyRound className="w-3.5 h-3.5 text-slate-400" />
             <span>Change Password</span>
           </button>
           <button
             onClick={handleExitAdmin}
-            className="w-full flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold admin-nav-3d-dark"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Exit to Storefront</span>
@@ -385,7 +384,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMobileNavOpen(!mobileNavOpen)}
-              className="lg:hidden p-1.5 rounded-lg text-slate-600 hover:bg-slate-100"
+              aria-label="Toggle navigation menu"
+              className="lg:hidden admin-btn-3d-icon p-2 text-slate-700"
             >
               <Menu className="w-5 h-5" />
             </button>
@@ -397,21 +397,23 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5 sm:gap-3">
-            {/* Live Inactivity Session Countdown Timer */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Live Inactivity Session Countdown Timer (Click to extend) */}
             {isAuthenticated && (
-              <div
-                className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
-                  isExpiringSoon
-                    ? 'bg-rose-50 border-rose-300 text-rose-700 animate-pulse font-bold'
-                    : 'bg-slate-100/90 border-slate-200 text-slate-700'
+              <button
+                type="button"
+                onClick={extendSession}
+                className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold admin-btn-3d-timer ${
+                  isExpiringSoon ? 'admin-btn-3d-timer-expiring animate-pulse' : ''
                 }`}
-                title="Active administrative session countdown. Automatically terminates on inactivity."
+                title="Active administrative session countdown. Click to extend session."
+                aria-label="Active administrative session countdown. Click to extend session."
               >
                 <Clock className={`w-3.5 h-3.5 ${isExpiringSoon ? 'text-rose-600' : 'text-blue-600'} shrink-0`} />
-                <span className="hidden sm:inline">Session expires in</span>
-                <strong className="font-mono">{formatRemainingTime(secondsRemaining)}</strong>
-              </div>
+                <span className="hidden md:inline">Session expires in</span>
+                <span className="hidden sm:inline md:hidden">Session:</span>
+                <strong className="font-mono tabular-nums">{formatRemainingTime(secondsRemaining)}</strong>
+              </button>
             )}
 
             {/* Authenticated user session info */}
@@ -425,7 +427,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 
             <button
               onClick={() => setShowPasswordModal(true)}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-700 hover:text-blue-700 bg-slate-100 hover:bg-slate-200/80 rounded-xl border border-slate-300 transition-colors cursor-pointer"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl admin-btn-3d-secondary"
+              title="Change Administrative Password"
             >
               <KeyRound className="w-3.5 h-3.5 text-slate-500" />
               <span>Change Password</span>
@@ -433,7 +436,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 
             <button
               onClick={() => logout('USER_LOGOUT')}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-rose-700 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 rounded-xl border border-rose-200 transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl admin-btn-3d-danger"
+              title="Sign Out of Administration Console"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Sign Out</span>
@@ -441,9 +445,12 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 
             <button
               onClick={handleExitAdmin}
-              className="lg:hidden text-xs font-bold text-blue-700 bg-blue-50 px-3 py-1.5 rounded-lg cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl admin-btn-3d-secondary text-blue-700"
+              title="Return to Public Storefront Website"
             >
-              Exit
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Public Website</span>
+              <span className="sm:hidden">Exit</span>
             </button>
           </div>
         </header>
@@ -454,18 +461,22 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
             <div className="bg-slate-900 text-white w-64 p-4 space-y-4">
               <div className="flex items-center justify-between border-b border-slate-800 pb-3">
                 <div className="font-bold text-xs text-cyan-400">PRINTEZYOUR ADMIN</div>
-                <button onClick={() => setMobileNavOpen(false)}>
-                  <X className="w-5 h-5 text-slate-400" />
+                <button
+                  onClick={() => setMobileNavOpen(false)}
+                  aria-label="Close navigation"
+                  className="admin-btn-3d-dark-icon p-1.5"
+                >
+                  <X className="w-4 h-4 text-slate-400" />
                 </button>
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 {navItems.map(item => (
                   <button
                     key={item.id}
                     onClick={() => handleNavigateTab(item.id)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium ${
-                      currentTab === item.id ? 'bg-blue-600 text-white' : 'text-slate-400'
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium ${
+                      currentTab === item.id ? 'admin-nav-3d-dark-active' : 'admin-nav-3d-dark'
                     }`}
                   >
                     <div className="flex items-center gap-2">
@@ -564,14 +575,14 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
               <button
                 type="button"
                 onClick={() => logout('USER_LOGOUT')}
-                className="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs font-bold transition-colors cursor-pointer"
+                className="px-4 py-2.5 rounded-xl admin-btn-3d-secondary text-rose-700 text-xs font-bold"
               >
                 Logout Now
               </button>
               <button
                 type="button"
                 onClick={extendSession}
-                className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors shadow-sm cursor-pointer"
+                className="px-5 py-2.5 rounded-xl admin-btn-3d-primary text-white text-xs font-bold"
               >
                 Continue Session
               </button>
