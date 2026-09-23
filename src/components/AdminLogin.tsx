@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { Lock, Mail, Eye, EyeOff, ShieldCheck, AlertCircle, Info, KeyRound, CheckCircle2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Lock, Mail, Eye, EyeOff, ShieldCheck, AlertCircle, Info, KeyRound, CheckCircle2, Server, Settings2, RefreshCw } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { getAssetUrl } from '../utils/assets';
+import { getActiveApiBaseUrl, getCustomApiUrl, setCustomApiUrl } from '../services/api';
 
 interface AdminLoginProps {
   onSuccess?: () => void;
@@ -16,6 +17,86 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, onExit }) => 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showForgotModal, setShowForgotModal] = useState(false);
+
+  // Production Backend Server Status & Diagnostics
+  const [activeBaseUrl, setActiveBaseUrl] = useState(() => getActiveApiBaseUrl());
+  const [backendReachable, setBackendReachable] = useState<boolean | null>(null);
+  const [showServerModal, setShowServerModal] = useState(false);
+  const [serverUrlInput, setServerUrlInput] = useState(() => getCustomApiUrl() || activeBaseUrl);
+  const [testingConnection, setTestingConnection] = useState(false);
+  const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    const testHealth = async () => {
+      try {
+        const url = getActiveApiBaseUrl();
+        const res = await fetch(`${url}/api/health`, { method: 'GET' });
+        if (isMounted) {
+          setBackendReachable(res.ok);
+        }
+      } catch {
+        if (isMounted) {
+          setBackendReachable(false);
+        }
+      }
+    };
+    testHealth();
+    return () => {
+      isMounted = false;
+    };
+  }, [activeBaseUrl]);
+
+  const handleTestConnection = async () => {
+    setTestingConnection(true);
+    setTestResult(null);
+    const target = serverUrlInput.trim().replace(/\/+$/, '');
+    if (!target) {
+      setTestResult({ ok: false, message: 'Please enter a valid backend URL' });
+      setTestingConnection(false);
+      return;
+    }
+
+    try {
+      const res = await fetch(`${target}/api/health`, { method: 'GET' });
+      if (res.ok) {
+        const json = await res.json().catch(() => ({}));
+        setTestResult({
+          ok: true,
+          message: `Connected successfully! Engine: ${json.service || 'PrintezYour API'}`
+        });
+      } else {
+        setTestResult({
+          ok: false,
+          message: `Server reached but returned HTTP ${res.status}. Check endpoint path.`
+        });
+      }
+    } catch (err: any) {
+      setTestResult({
+        ok: false,
+        message: `Failed to connect: ${err.message || 'Network error / CORS issue'}. Ensure backend is online.`
+      });
+    } finally {
+      setTestingConnection(false);
+    }
+  };
+
+  const handleSaveServerConfig = () => {
+    const target = serverUrlInput.trim().replace(/\/+$/, '');
+    setCustomApiUrl(target);
+    const updated = getActiveApiBaseUrl();
+    setActiveBaseUrl(updated);
+    setShowServerModal(false);
+    setTestResult(null);
+  };
+
+  const handleResetServerConfig = () => {
+    setCustomApiUrl('');
+    const updated = getActiveApiBaseUrl();
+    setServerUrlInput(updated);
+    setActiveBaseUrl(updated);
+    setTestResult(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -162,8 +243,37 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, onExit }) => 
           </div>
         </div>
 
+        {/* Backend Connectivity Status Strip */}
+        <div className="mt-3.5 flex items-center justify-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/90 border border-slate-800/80 text-[11px] text-slate-400 shadow-sm backdrop-blur-xs">
+            <span
+              className={`w-2 h-2 rounded-full shrink-0 ${
+                backendReachable === true
+                  ? 'bg-emerald-400 shadow-xs shadow-emerald-400/50'
+                  : backendReachable === false
+                  ? 'bg-rose-400 shadow-xs shadow-rose-400/50'
+                  : 'bg-amber-400 animate-pulse'
+              }`}
+            />
+            <span className="text-slate-400">
+              API Server:{' '}
+              <strong className="text-slate-200 font-mono font-medium truncate max-w-[200px] inline-block align-bottom">
+                {activeBaseUrl.replace(/^https?:\/\//, '')}
+              </strong>
+            </span>
+            <button
+              type="button"
+              onClick={() => setShowServerModal(true)}
+              className="text-cyan-400 hover:text-cyan-300 font-semibold underline underline-offset-2 ml-1 cursor-pointer flex items-center gap-1"
+            >
+              <Settings2 className="w-3 h-3" />
+              Configure
+            </button>
+          </div>
+        </div>
+
         {onExit && (
-          <div className="mt-4 text-center">
+          <div className="mt-3 text-center">
             <button
               onClick={onExit}
               className="text-xs text-slate-500 hover:text-slate-400 transition-colors"
@@ -173,6 +283,103 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, onExit }) => 
           </div>
         )}
       </div>
+
+      {/* BACKEND SERVER CONFIGURATION MODAL */}
+      {showServerModal && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 animate-in fade-in duration-200">
+            <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
+              <div className="w-9 h-9 rounded-xl bg-cyan-950 border border-cyan-800 text-cyan-400 flex items-center justify-center shrink-0">
+                <Server className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-white">Backend Server Configuration</h3>
+                <p className="text-[11px] text-slate-400">
+                  Configure the production Node.js API server for this client.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-slate-300 mb-1">
+                  API Base URL
+                </label>
+                <input
+                  type="url"
+                  value={serverUrlInput}
+                  onChange={(e) => setServerUrlInput(e.target.value)}
+                  placeholder="e.g. https://api.printezyour.com or https://printezyour.ai.studio"
+                  className="w-full bg-slate-950/80 border border-slate-700 text-white rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-cyan-500 focus:outline-hidden font-mono"
+                />
+                <p className="text-[10px] text-slate-500 mt-1">
+                  Leave default or set your Hostinger, VPS, Cloud Run, or custom domain backend.
+                </p>
+              </div>
+
+              {testResult && (
+                <div
+                  className={`p-3 rounded-xl text-xs flex items-start gap-2 ${
+                    testResult.ok
+                      ? 'bg-emerald-950/60 border border-emerald-800 text-emerald-200'
+                      : 'bg-rose-950/60 border border-rose-800 text-rose-200'
+                  }`}
+                >
+                  {testResult.ok ? (
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  ) : (
+                    <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                  )}
+                  <span className="leading-relaxed">{testResult.message}</span>
+                </div>
+              )}
+
+              <div className="flex items-center gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={handleTestConnection}
+                  disabled={testingConnection}
+                  className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
+                >
+                  {testingConnection ? (
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <RefreshCw className="w-3.5 h-3.5" />
+                  )}
+                  <span>Test Connection</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleResetServerConfig}
+                  className="bg-slate-800/60 hover:bg-slate-800 text-slate-400 hover:text-slate-300 py-2 px-3 rounded-xl text-xs transition-colors"
+                >
+                  Reset Default
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowServerModal(false);
+                  setTestResult(null);
+                }}
+                className="px-3.5 py-2 text-xs text-slate-400 hover:text-slate-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveServerConfig}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl text-xs transition-colors shadow-md shadow-blue-900/40"
+              >
+                Save & Apply
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* FORGOT PASSWORD MODAL (Exact Mandated Rule) */}
       {showForgotModal && (

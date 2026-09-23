@@ -25,15 +25,32 @@ async function startServer() {
     ? allowedOriginsEnv.split(',').map(o => o.trim()).filter(Boolean)
     : [];
 
+  // Known production frontend hosts
+  const trustedOrigins = [
+    'https://abhiswami8185-droid.github.io',
+    'https://printezyour.com',
+    'https://admin.printezyour.com',
+    'https://printezyour.ai.studio'
+  ];
+
   app.use(cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (like mobile apps, curl, server-to-server, or same-origin)
       if (!origin) return callback(null, true);
-      // If origins configured, match them or allow wildcard '*'
-      if (configuredOrigins.length === 0 || configuredOrigins.includes('*') || configuredOrigins.includes(origin)) {
+
+      // Check configured origins or wildcards
+      if (
+        configuredOrigins.length === 0 ||
+        configuredOrigins.includes('*') ||
+        configuredOrigins.includes(origin) ||
+        trustedOrigins.includes(origin) ||
+        origin.endsWith('.github.io') ||
+        origin.endsWith('.ai.studio') ||
+        origin.endsWith('.run.app')
+      ) {
         return callback(null, true);
       }
-      // In development/preview or default hosting, allow origin
+
       return callback(null, true);
     },
     credentials: true,

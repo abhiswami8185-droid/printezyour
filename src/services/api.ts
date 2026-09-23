@@ -49,21 +49,79 @@ const getHeaders = (_role?: UserRole): HeadersInit => {
   return headers;
 };
 
+export const getCustomApiUrl = (): string => {
+  try {
+    return localStorage.getItem('printezyour_backend_url') || '';
+  } catch {
+    return '';
+  }
+};
+
+export const setCustomApiUrl = (url: string) => {
+  try {
+    if (url) {
+      localStorage.setItem('printezyour_backend_url', url.trim().replace(/\/+$/, ''));
+    } else {
+      localStorage.removeItem('printezyour_backend_url');
+    }
+  } catch {
+    // Ignore storage errors
+  }
+};
+
+/**
+ * Returns the currently active backend API base URL for diagnostics and UI display.
+ */
+export const getActiveApiBaseUrl = (): string => {
+  if (typeof window !== 'undefined' && window.location) {
+    const hostname = window.location.hostname.toLowerCase();
+    if (
+      hostname.endsWith('.run.app') ||
+      hostname === 'localhost' ||
+      hostname === '127.0.0.1' ||
+      hostname.endsWith('.local')
+    ) {
+      return window.location.origin;
+    }
+  }
+
+  const customUrl = getCustomApiUrl();
+  if (customUrl) {
+    return customUrl;
+  }
+
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl && typeof envUrl === 'string') {
+    const trimmed = envUrl.trim().replace(/\/+$/, '');
+    if (trimmed && !trimmed.includes('example.com')) {
+      return trimmed;
+    }
+  }
+
+  if (typeof window !== 'undefined' && window.location) {
+    const hostname = window.location.hostname.toLowerCase();
+    if (hostname.endsWith('.github.io')) {
+      return 'https://printezyour.ai.studio';
+    }
+  }
+
+  return typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
+};
+
 /**
  * Resolves the backend API URL.
  * If running in full-stack dev/preview/monolith (same container as Express),
  * always resolves to the clean relative endpoint '/api/...' on the same origin.
- * If VITE_API_URL is configured with a real external backend (e.g. for GitHub Pages),
- * it prepends the backend base URL (ignoring dummy/non-existent .ai.studio placeholders).
+ * If running in decoupled mode (e.g. GitHub Pages static hosting),
+ * routes to the designated production backend URL (with custom override support).
  */
 export const getApiUrl = (endpoint: string): string => {
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : ('/' + endpoint);
 
-  // If in browser:
+  // 1. Browser runtime check: if inside AI Studio preview or local dev (Express + Vite monolith),
+  // always use relative paths so requests hit the local Express backend on the same origin.
   if (typeof window !== 'undefined' && window.location) {
     const hostname = window.location.hostname.toLowerCase();
-    // When running inside AI Studio preview or local dev (Express + Vite monolith),
-    // always use relative paths so requests hit the local Express backend on the same origin.
     if (
       hostname.endsWith('.run.app') ||
       hostname === 'localhost' ||
@@ -74,16 +132,26 @@ export const getApiUrl = (endpoint: string): string => {
     }
   }
 
+  // 2. Custom runtime override set by user in localStorage
+  const customUrl = getCustomApiUrl();
+  if (customUrl) {
+    return customUrl + cleanEndpoint;
+  }
+
+  // 3. Build-time environment variable VITE_API_URL
   const envUrl = import.meta.env.VITE_API_URL;
   if (envUrl && typeof envUrl === 'string') {
     const trimmed = envUrl.trim().replace(/\/+$/, '');
-    // Ignore placeholder/dummy domains that don't have an active API backend
-    if (
-      trimmed &&
-      !trimmed.includes('.ai.studio') &&
-      !trimmed.includes('example.com')
-    ) {
+    if (trimmed && !trimmed.includes('example.com')) {
       return trimmed + cleanEndpoint;
+    }
+  }
+
+  // 4. Decoupled static hosting on GitHub Pages fallback
+  if (typeof window !== 'undefined' && window.location) {
+    const hostname = window.location.hostname.toLowerCase();
+    if (hostname.endsWith('.github.io')) {
+      return 'https://printezyour.ai.studio' + cleanEndpoint;
     }
   }
 
@@ -96,25 +164,31 @@ const apiFetch = async (url: string, init?: RequestInit): Promise<Response> => {
 
   try {
     const res = await fetch(resolvedUrl, init);
-    // If an external endpoint returns 5xx server error, try fallback to relative
+    // If an external endpoint returns 5xx server error, try fallback to relative (only if not static host)
     if (!res.ok && resolvedUrl !== cleanEndpoint && res.status >= 500) {
-      try {
-        const fallbackRes = await fetch(cleanEndpoint, init);
-        if (fallbackRes.ok) return fallbackRes;
-      } catch {
-        // use original res
+      const isStaticHost = typeof window !== 'undefined' && window.location.hostname.endsWith('.github.io');
+      if (!isStaticHost) {
+        try {
+          const fallbackRes = await fetch(cleanEndpoint, init);
+          if (fallbackRes.ok) return fallbackRes;
+        } catch {
+          // use original res
+        }
       }
     }
     return res;
   } catch (err) {
     // If external fetch threw a network error (e.g. Failed to fetch, DNS failure, CORS failure),
-    // and resolvedUrl was not the relative endpoint, fallback immediately to the same-origin relative path.
+    // and resolvedUrl was not the relative endpoint, fallback immediately to the same-origin relative path only if not static host.
     if (resolvedUrl !== cleanEndpoint) {
-      try {
-        const fallbackRes = await fetch(cleanEndpoint, init);
-        return fallbackRes;
-      } catch {
-        // throw original error if relative also fails
+      const isStaticHost = typeof window !== 'undefined' && window.location.hostname.endsWith('.github.io');
+      if (!isStaticHost) {
+        try {
+          const fallbackRes = await fetch(cleanEndpoint, init);
+          return fallbackRes;
+        } catch {
+          // throw original error if relative also fails
+        }
       }
     }
     throw err;
@@ -124,14 +198,35 @@ const apiFetch = async (url: string, init?: RequestInit): Promise<Response> => {
 export const api = {
   // --- Auth ---
   async login(email: string, password?: string) {
-    const res = await apiFetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
+    const resolvedUrl = getApiUrl('/api/auth/login');
+    let res: Response;
+    try {
+      res = await apiFetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+    } catch (networkErr: any) {
+      throw new Error(`Unable to reach backend server at ${resolvedUrl}. Please check your connection or backend server status.`);
+    }
+
     if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: 'Authentication failed' }));
-      throw new Error(err.error || 'Authentication failed');
+      let errorMsg = 'Authentication failed';
+      try {
+        const err = await res.json();
+        if (err && err.error) {
+          errorMsg = err.error;
+        }
+      } catch {
+        if (res.status === 405) {
+          errorMsg = `Endpoint returned HTTP 405 Method Not Allowed. The static host at ${window.location.origin} does not support backend API routes. Please configure VITE_API_URL with your live backend server.`;
+        } else if (res.status === 404) {
+          errorMsg = `Backend endpoint /api/auth/login not found on ${resolvedUrl}.`;
+        } else {
+          errorMsg = `Authentication server error (HTTP ${res.status})`;
+        }
+      }
+      throw new Error(errorMsg);
     }
     const data = await res.json();
     if (data.token) {

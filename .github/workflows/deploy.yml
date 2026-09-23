@@ -36,6 +36,7 @@ jobs:
       - name: Build static site for GitHub Pages
         env:
           VITE_BASE_PATH: '/printezyour/'
+          VITE_API_URL: ${{ vars.VITE_API_URL || secrets.VITE_API_URL || 'https://printezyour.ai.studio' }}
         run: npm run build:client
 
       - name: Ensure 404.html exists in dist

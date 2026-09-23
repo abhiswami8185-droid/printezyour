@@ -17,7 +17,7 @@ export function getPublicSiteUrl(): string {
   const envUrl = import.meta.env.VITE_PUBLIC_SITE_URL;
   if (envUrl && typeof envUrl === 'string' && envUrl.trim() !== '') {
     const trimmed = envUrl.trim().replace(/\/+$/, '');
-    if (!trimmed.includes('.ai.studio') && !trimmed.includes('example.com')) {
+    if (!trimmed.includes('example.com')) {
       return trimmed;
     }
   }
@@ -49,7 +49,7 @@ export function getAdminSiteUrl(): string {
   const envUrl = import.meta.env.VITE_ADMIN_SITE_URL;
   if (envUrl && typeof envUrl === 'string' && envUrl.trim() !== '') {
     const trimmed = envUrl.trim().replace(/\/+$/, '');
-    if (!trimmed.includes('.ai.studio') && !trimmed.includes('example.com')) {
+    if (!trimmed.includes('example.com')) {
       return trimmed;
     }
   }
@@ -81,7 +81,7 @@ export function isCurrentlyAdminDomain(): boolean {
   }
 
   const configuredAdmin = import.meta.env.VITE_ADMIN_SITE_URL;
-  if (configuredAdmin && !configuredAdmin.includes('.ai.studio')) {
+  if (configuredAdmin && !configuredAdmin.includes('example.com')) {
     try {
       const adminUrl = new URL(configuredAdmin);
       if (adminUrl.hostname.toLowerCase() === hostname) {
