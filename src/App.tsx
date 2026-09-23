@@ -208,9 +208,8 @@ export default function App() {
   }
 
   return (
-    <AuthProvider>
-      <CartProvider>
-        <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans selection:bg-blue-600 selection:text-white">
+    <CartProvider>
+      <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans selection:bg-blue-600 selection:text-white">
           {/* Top Banner / Announcement */}
           <div className="bg-slate-900 text-slate-300 text-[11px] py-1.5 px-4 text-center border-b border-slate-800">
             <span className="font-semibold text-cyan-400">PrintezYour Chandigarh</span> — Commercial Heidelberg Offset & Roland Large Format Presses · GST Invoicing & Tricity Doorstep Delivery
@@ -344,6 +343,5 @@ export default function App() {
           />
         </div>
       </CartProvider>
-    </AuthProvider>
   );
 }

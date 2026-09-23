@@ -14,7 +14,6 @@ import {
   LayoutDashboard
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { useAuth } from '../context/AuthContext';
 import { Category } from '../types';
 import { getAssetUrl } from '../utils/assets';
 
@@ -27,7 +26,6 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ categories = [], currentView, onNavigate, onOpenCart }) => {
   const { totalItemCount, setIsCartOpen } = useCart();
-  const { role, switchRole } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');

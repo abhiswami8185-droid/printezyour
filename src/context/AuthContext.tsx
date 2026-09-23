@@ -422,10 +422,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
+const defaultGuestAuthContext: AuthContextType = {
+  user: null,
+  role: 'guest',
+  roleName: 'Guest',
+  isAuthenticated: false,
+  isLoading: false,
+  hasActiveAdminSession: false,
+  secondsRemaining: 0,
+  sessionTimeoutMinutes: 30,
+  isExpiringSoon: false,
+  hasPermission: () => false,
+  hasAnyPermission: () => false,
+  login: async () => {},
+  logout: () => {},
+  extendSession: async () => {},
+  exitAdminSession: () => {},
+  changePassword: async () => ({ success: false, message: 'Not authenticated' }),
+  refreshUser: async () => {}
+};
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+  return context || defaultGuestAuthContext;
 };
