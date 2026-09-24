@@ -111,6 +111,13 @@ export const AdminUsers: React.FC = () => {
       'products.pricing',
       'products.inventory'
     ],
+    'Media Management': [
+      'media.view',
+      'media.upload',
+      'media.edit',
+      'media.delete',
+      'media.reorder'
+    ],
     'Inventory': [
       'inventory.view',
       'inventory.create',
@@ -169,6 +176,11 @@ export const AdminUsers: React.FC = () => {
     'products.delete': 'Delete Products',
     'products.pricing': 'Pricing',
     'products.inventory': 'Stock Control',
+    'media.view': 'View Media',
+    'media.upload': 'Upload Media',
+    'media.edit': 'Edit Media',
+    'media.delete': 'Delete Media',
+    'media.reorder': 'Reorder Media',
     'inventory.view': 'View Inventory',
     'inventory.create': 'Create Inventory',
     'inventory.edit': 'Edit Inventory',

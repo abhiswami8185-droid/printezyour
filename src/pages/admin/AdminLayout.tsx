@@ -17,7 +17,8 @@ import {
   UserCheck,
   Activity,
   LogOut,
-  AlertTriangle
+  AlertTriangle,
+  Film
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
@@ -40,6 +41,7 @@ import { AdminDashboard } from './AdminDashboard';
 import { AdminOrders } from './AdminOrders';
 import { AdminQuotes } from './AdminQuotes';
 import { AdminProducts } from './AdminProducts';
+import { AdminMediaManagement } from './AdminMediaManagement';
 import { AdminInventory } from './AdminInventory';
 import { AdminPurchases } from './AdminPurchases';
 import { AdminCustomers } from './AdminCustomers';
@@ -103,6 +105,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
         orders: 'orders.view',
         quotes: 'quotes.view',
         products: 'products.view',
+        media: 'media.view',
         inventory: 'inventory.view',
         purchases: 'purchases.view',
         customers: 'customers.view',
@@ -224,6 +227,12 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
         label: 'Products & Services',
         icon: <Package className="w-4 h-4" />,
         show: hasPermission('products.view')
+      },
+      {
+        id: 'media',
+        label: 'Media Management',
+        icon: <Film className="w-4 h-4" />,
+        show: hasPermission('media.view')
       },
       {
         id: 'inventory',
@@ -528,6 +537,14 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                   onServicesUpdated={fetchAllAdminData}
                   onInventoryUpdated={fetchAllAdminData}
                   onNavigateTab={handleNavigateTab}
+                />
+              )}
+              {currentTab === 'media' && hasPermission('media.view') && (
+                <AdminMediaManagement
+                  products={products}
+                  services={services}
+                  onProductsUpdated={fetchAllAdminData}
+                  onServicesUpdated={fetchAllAdminData}
                 />
               )}
               {currentTab === 'inventory' && hasPermission('inventory.view') && (

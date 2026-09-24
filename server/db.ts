@@ -15,7 +15,8 @@ import {
   User,
   AuditLog,
   RoleDefinition,
-  PermissionKey
+  PermissionKey,
+  MediaItem
 } from '../src/types';
 import {
   initialCategories,
@@ -81,7 +82,12 @@ export const defaultRoles: RoleDefinition[] = [
       'reports.export',
       'settings.view',
       'content.view',
-      'audit.view'
+      'audit.view',
+      'media.view',
+      'media.upload',
+      'media.edit',
+      'media.delete',
+      'media.reorder'
     ],
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z'
@@ -159,6 +165,7 @@ export interface DatabaseSchema {
   roles: RoleDefinition[];
   users: User[];
   auditLogs: AuditLog[];
+  media: MediaItem[];
 }
 
 const DATA_DIR = path.join(process.cwd(), 'data');
@@ -215,7 +222,8 @@ class DatabaseManager {
           action: 'INIT_DB',
           details: 'PrintezYour database initialized with authentic services and products'
         }
-      ]
+      ],
+      media: []
     };
   }
 
@@ -286,7 +294,8 @@ class DatabaseManager {
           settings: parsed.settings || defaults.settings,
           roles: existingRoles,
           users,
-          auditLogs: parsed.auditLogs || defaults.auditLogs
+          auditLogs: parsed.auditLogs || defaults.auditLogs,
+          media: Array.isArray(parsed.media) ? parsed.media : []
         };
         this.saveImmediate(schema);
         return schema;
@@ -1420,6 +1429,243 @@ class DatabaseManager {
       salesChart,
       recentOrders: orders.slice(0, 5)
     };
+  }
+
+  // --- Media Showcase & Asset Management ---
+  public getMedia(section?: string, activeOnly?: boolean): MediaItem[] {
+    let list = this.data.media || [];
+    if (section) {
+      list = list.filter(m => m.section === section);
+    }
+    if (activeOnly) {
+      list = list.filter(m => m.active);
+    }
+    return [...list].sort((a, b) => a.displayOrder - b.displayOrder);
+  }
+
+  public getMediaById(id: string): MediaItem | undefined {
+    return (this.data.media || []).find(m => m.id === id);
+  }
+
+  public createMediaItem(itemData: Partial<MediaItem>, actor: string = 'Admin'): MediaItem {
+    if (!this.data.media) this.data.media = [];
+    const maxOrder = this.data.media.reduce((max, m) => Math.max(max, m.displayOrder || 0), 0);
+    const now = new Date().toISOString();
+    const newItem: MediaItem = {
+      id: itemData.id || `media-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      title: itemData.title || 'Showcase Media',
+      url: itemData.url || '',
+      thumbnailUrl: itemData.thumbnailUrl || itemData.url || '',
+      type: itemData.type || (itemData.url?.match(/\.(mp4|webm)$/i) ? 'video' : 'image'),
+      mimeType: itemData.mimeType || (itemData.type === 'video' ? 'video/mp4' : 'image/jpeg'),
+      fileSize: itemData.fileSize || 0,
+      width: itemData.width,
+      height: itemData.height,
+      duration: itemData.duration,
+      section: itemData.section || 'home_showcase',
+      active: itemData.active !== undefined ? itemData.active : true,
+      displayOrder: itemData.displayOrder !== undefined ? itemData.displayOrder : maxOrder + 1,
+      caption: itemData.caption || '',
+      uploadedBy: actor,
+      createdAt: now,
+      updatedAt: now
+    };
+
+    this.data.media.push(newItem);
+    this.logAudit(actor, 'ADMIN', 'UPLOAD_MEDIA', `Uploaded ${newItem.type} showcase item: ${newItem.title}`, {
+      targetType: 'MediaItem',
+      targetId: newItem.id
+    });
+    this.saveImmediate(this.data);
+    return newItem;
+  }
+
+  public updateMediaItem(id: string, updates: Partial<MediaItem>, actor: string = 'Admin'): MediaItem | null {
+    if (!this.data.media) this.data.media = [];
+    const idx = this.data.media.findIndex(m => m.id === id);
+    if (idx === -1) return null;
+
+    const oldItem = this.data.media[idx];
+    const updated: MediaItem = {
+      ...oldItem,
+      ...updates,
+      updatedAt: new Date().toISOString()
+    };
+    this.data.media[idx] = updated;
+
+    let action = 'UPDATE_MEDIA';
+    let detail = `Updated media item: ${updated.title}`;
+    if (updates.active !== undefined && updates.active !== oldItem.active) {
+      action = updates.active ? 'ACTIVATE_MEDIA' : 'DEACTIVATE_MEDIA';
+      detail = `${updates.active ? 'Activated' : 'Deactivated'} showcase media item: ${updated.title}`;
+    }
+    this.logAudit(actor, 'ADMIN', action, detail, {
+      targetType: 'MediaItem',
+      targetId: id
+    });
+    this.saveImmediate(this.data);
+    return updated;
+  }
+
+  public deleteMediaItem(id: string, actor: string = 'Admin'): { success: boolean; message: string } {
+    if (!this.data.media) this.data.media = [];
+    const item = this.data.media.find(m => m.id === id);
+    if (!item) {
+      return { success: false, message: 'Media item not found' };
+    }
+
+    this.data.media = this.data.media.filter(m => m.id !== id);
+    this.data.media
+      .sort((a, b) => a.displayOrder - b.displayOrder)
+      .forEach((m, idx) => {
+        m.displayOrder = idx + 1;
+      });
+
+    this.logAudit(actor, 'ADMIN', 'DELETE_MEDIA', `Deleted ${item.type} showcase item: ${item.title}`, {
+      targetType: 'MediaItem',
+      targetId: id
+    });
+    this.saveImmediate(this.data);
+    return { success: true, message: 'Media deleted successfully' };
+  }
+
+  public reorderMedia(orderedIds: string[], actor: string = 'Admin'): MediaItem[] {
+    if (!this.data.media) this.data.media = [];
+    orderedIds.forEach((id, index) => {
+      const item = this.data.media.find(m => m.id === id);
+      if (item) {
+        item.displayOrder = index + 1;
+        item.updatedAt = new Date().toISOString();
+      }
+    });
+
+    this.logAudit(actor, 'ADMIN', 'REORDER_MEDIA', `Reordered showcase media (${orderedIds.length} items)`, {
+      targetType: 'MediaItem'
+    });
+    this.saveImmediate(this.data);
+    return this.getMedia('home_showcase');
+  }
+
+  public replaceMediaFile(
+    id: string,
+    newFile: { url: string; mimeType: string; fileSize: number; type: 'image' | 'video' },
+    actor: string = 'Admin'
+  ): MediaItem | null {
+    if (!this.data.media) this.data.media = [];
+    const item = this.data.media.find(m => m.id === id);
+    if (!item) return null;
+
+    const oldUrl = item.url;
+    item.url = newFile.url;
+    item.thumbnailUrl = newFile.url;
+    item.mimeType = newFile.mimeType;
+    item.fileSize = newFile.fileSize;
+    item.type = newFile.type;
+    item.updatedAt = new Date().toISOString();
+
+    this.logAudit(actor, 'ADMIN', 'REPLACE_MEDIA_FILE', `Replaced asset file for showcase item: ${item.title}`, {
+      targetType: 'MediaItem',
+      targetId: id,
+      previousValue: oldUrl,
+      newValue: newFile.url
+    });
+    this.saveImmediate(this.data);
+    return item;
+  }
+
+  public updateProductMedia(
+    productId: string,
+    action: 'set_primary' | 'add_gallery' | 'remove_image' | 'reorder_gallery' | 'replace_image',
+    payload: {
+      imageUrl?: string;
+      imageUrls?: string[];
+      oldImageUrl?: string;
+      newImageUrl?: string;
+      images?: string[];
+    },
+    actor: string = 'Admin'
+  ): Product | null {
+    const prod = this.getProductBySlugOrId(productId);
+    if (!prod) return null;
+
+    let images = Array.isArray(prod.images) ? [...prod.images] : [];
+    if (images.length === 0 && prod.image) {
+      images = [prod.image];
+    }
+
+    let detail = '';
+
+    switch (action) {
+      case 'set_primary': {
+        const targetImg = payload.imageUrl || '';
+        if (targetImg) {
+          images = [targetImg, ...images.filter(img => img !== targetImg)];
+          prod.image = targetImg;
+          prod.images = images;
+          detail = `Set primary image for product: ${prod.name}`;
+        }
+        break;
+      }
+      case 'add_gallery': {
+        const toAdd = payload.imageUrls || (payload.imageUrl ? [payload.imageUrl] : []);
+        toAdd.forEach(img => {
+          if (img && !images.includes(img)) {
+            images.push(img);
+          }
+        });
+        if (!prod.image && images.length > 0) {
+          prod.image = images[0];
+        }
+        prod.images = images;
+        detail = `Added ${toAdd.length} gallery image(s) to product: ${prod.name}`;
+        break;
+      }
+      case 'remove_image': {
+        const toRemove = payload.imageUrl || '';
+        images = images.filter(img => img !== toRemove);
+        if (prod.image === toRemove) {
+          prod.image = images[0] || '';
+        }
+        prod.images = images;
+        detail = `Removed image from product: ${prod.name}`;
+        break;
+      }
+      case 'reorder_gallery': {
+        if (Array.isArray(payload.images) && payload.images.length > 0) {
+          prod.images = payload.images;
+          prod.image = payload.images[0] || prod.image;
+          detail = `Reordered gallery images for product: ${prod.name}`;
+        }
+        break;
+      }
+      case 'replace_image': {
+        const { oldImageUrl, newImageUrl } = payload;
+        if (newImageUrl) {
+          if (oldImageUrl) {
+            images = images.map(img => (img === oldImageUrl ? newImageUrl : img));
+            if (!images.includes(newImageUrl)) {
+              images.unshift(newImageUrl);
+            }
+          } else {
+            images = [newImageUrl, ...images.filter(img => img !== newImageUrl)];
+          }
+          if (prod.image === oldImageUrl || !prod.image) {
+            prod.image = newImageUrl;
+          }
+          prod.images = images;
+          detail = `Replaced image for product: ${prod.name}`;
+        }
+        break;
+      }
+    }
+
+    prod.updatedAt = new Date().toISOString();
+    this.logAudit(actor, 'ADMIN', 'UPDATE_PRODUCT_MEDIA', detail || `Updated media for product: ${prod.name}`, {
+      targetType: 'Product',
+      targetId: prod.id
+    });
+    this.saveImmediate(this.data);
+    return prod;
   }
 }
 

@@ -51,7 +51,34 @@ export type PermissionKey =
   | 'settings.edit'
   | 'content.view'
   | 'content.edit'
-  | 'audit.view';
+  | 'audit.view'
+  | 'media.view'
+  | 'media.upload'
+  | 'media.edit'
+  | 'media.delete'
+  | 'media.reorder';
+
+export type MediaType = 'image' | 'video';
+
+export interface MediaItem {
+  id: string;
+  title: string;
+  url: string;
+  thumbnailUrl?: string;
+  type: MediaType;
+  mimeType: string;
+  fileSize: number;
+  width?: number;
+  height?: number;
+  duration?: number;
+  section: 'home_showcase' | 'general';
+  active: boolean;
+  displayOrder: number;
+  caption?: string;
+  uploadedBy?: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export type UserRole = string; // Supports SUPER_ADMIN, ADMIN, MANAGER, STAFF, or custom created role IDs
 export type Role = UserRole;

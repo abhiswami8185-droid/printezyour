@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { Product, Category, ServiceItem } from '../types';
 import { LivePrinterHeroAnimation } from '../components/LivePrinterHeroAnimation';
+import { HomeMediaShowcase } from '../components/HomeMediaShowcase';
 import { getAssetUrl } from '../utils/assets';
 
 interface HomePageProps {
@@ -249,6 +250,11 @@ export const HomePage: React.FC<HomePageProps> = ({
           </div>
         </div>
       </section>
+
+      {/* ---------------------------------------------------- */}
+      {/* 2.5 REAL PRODUCTION HOME MEDIA SHOWCASE CAROUSEL */}
+      {/* ---------------------------------------------------- */}
+      <HomeMediaShowcase onNavigate={onNavigate} />
 
       {/* ---------------------------------------------------- */}
       {/* 3. FEATURED PRODUCTS CATALOG PREVIEW (Section 5, 6, 7) */}

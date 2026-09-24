@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path';
+import fs from 'fs';
 import cors from 'cors';
 import { createServer as createViteServer } from 'vite';
 import { apiRouter } from './server/routes/api';
@@ -69,6 +70,23 @@ async function startServer() {
       timestamp: new Date().toISOString()
     });
   });
+
+  // Static serving for uploaded media assets (supports range requests for videos)
+  const uploadsDirectory = path.join(process.cwd(), 'data', 'uploads');
+  if (!fs.existsSync(uploadsDirectory)) {
+    fs.mkdirSync(uploadsDirectory, { recursive: true });
+  }
+  app.use('/uploads', express.static(uploadsDirectory, {
+    maxAge: '7d',
+    setHeaders: (res, filePath) => {
+      res.setHeader('Accept-Ranges', 'bytes');
+      if (filePath.endsWith('.mp4')) {
+        res.setHeader('Content-Type', 'video/mp4');
+      } else if (filePath.endsWith('.webm')) {
+        res.setHeader('Content-Type', 'video/webm');
+      }
+    }
+  }));
 
   // Mount API router
   app.use('/api', apiRouter);

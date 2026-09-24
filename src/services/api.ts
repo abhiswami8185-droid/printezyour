@@ -13,7 +13,8 @@ import {
   UserRole,
   RoleDefinition,
   PermissionKey,
-  AuditLog
+  AuditLog,
+  MediaItem
 } from '../types';
 import { getPublicSiteUrl, getAdminSiteUrl } from '../config/site';
 
@@ -874,7 +875,7 @@ export const api = {
     return this.receivePurchase(id, 'Admin', role);
   },
 
-  // --- Artwork File Upload ---
+  // --- Artwork / File Upload ---
   async uploadArtwork(file: File): Promise<{
     name: string;
     filename: string;
@@ -897,6 +898,156 @@ export const api = {
       ...data.file,
       url: getApiUrl(data.file.url)
     };
+  },
+
+  async uploadFile(file: File) {
+    return this.uploadArtwork(file);
+  },
+
+  // --- Media Showcase & Asset Management ---
+  async getMedia(params?: { section?: string; activeOnly?: boolean }): Promise<MediaItem[]> {
+    const query = new URLSearchParams();
+    if (params?.section) query.set('section', params.section);
+    if (params?.activeOnly) query.set('activeOnly', 'true');
+    const qs = query.toString();
+    const res = await apiFetch(`/api/media${qs ? `?${qs}` : ''}`);
+    if (!res.ok) {
+      throw new Error('Failed to fetch media');
+    }
+    const items: MediaItem[] = await res.json();
+    return items.map(item => ({
+      ...item,
+      url: getApiUrl(item.url),
+      thumbnailUrl: item.thumbnailUrl ? getApiUrl(item.thumbnailUrl) : getApiUrl(item.url)
+    }));
+  },
+
+  async uploadMedia(files: File[], section: string = 'home_showcase'): Promise<MediaItem[]> {
+    const formData = new FormData();
+    files.forEach(f => formData.append('media', f));
+    formData.append('section', section);
+
+    const token = getAuthToken();
+    const customHeaders: Record<string, string> = {};
+    if (token) {
+      customHeaders['Authorization'] = `Bearer ${token}`;
+    }
+
+    const res = await apiFetch('/api/media/upload', {
+      method: 'POST',
+      headers: customHeaders,
+      body: formData
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Media upload failed' }));
+      throw new Error(err.error || 'Media upload failed');
+    }
+
+    const data = await res.json();
+    const items: MediaItem[] = data.items || (data.item ? [data.item] : []);
+    return items.map(item => ({
+      ...item,
+      url: getApiUrl(item.url),
+      thumbnailUrl: item.thumbnailUrl ? getApiUrl(item.thumbnailUrl) : getApiUrl(item.url)
+    }));
+  },
+
+  async updateMedia(id: string, updates: Partial<MediaItem>): Promise<MediaItem> {
+    const res = await apiFetch(`/api/media/${id}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify(updates)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Failed to update media' }));
+      throw new Error(err.error || 'Failed to update media');
+    }
+    const item: MediaItem = await res.json();
+    return {
+      ...item,
+      url: getApiUrl(item.url),
+      thumbnailUrl: item.thumbnailUrl ? getApiUrl(item.thumbnailUrl) : getApiUrl(item.url)
+    };
+  },
+
+  async replaceMedia(id: string, file: File): Promise<MediaItem> {
+    const formData = new FormData();
+    formData.append('media', file);
+    const token = getAuthToken();
+    const customHeaders: Record<string, string> = {};
+    if (token) {
+      customHeaders['Authorization'] = `Bearer ${token}`;
+    }
+
+    const res = await apiFetch(`/api/media/${id}/replace`, {
+      method: 'POST',
+      headers: customHeaders,
+      body: formData
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Failed to replace media file' }));
+      throw new Error(err.error || 'Failed to replace media file');
+    }
+    const item: MediaItem = await res.json();
+    return {
+      ...item,
+      url: getApiUrl(item.url),
+      thumbnailUrl: item.thumbnailUrl ? getApiUrl(item.thumbnailUrl) : getApiUrl(item.url)
+    };
+  },
+
+  async deleteMedia(id: string): Promise<{ success: boolean }> {
+    const res = await apiFetch(`/api/media/${id}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Failed to delete media' }));
+      throw new Error(err.error || 'Failed to delete media');
+    }
+    return await res.json();
+  },
+
+  async reorderMedia(orderedIds: string[]): Promise<MediaItem[]> {
+    const res = await apiFetch('/api/media/reorder', {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify({ orderedIds })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Failed to reorder media' }));
+      throw new Error(err.error || 'Failed to reorder media');
+    }
+    const items: MediaItem[] = await res.json();
+    return items.map(item => ({
+      ...item,
+      url: getApiUrl(item.url),
+      thumbnailUrl: item.thumbnailUrl ? getApiUrl(item.thumbnailUrl) : getApiUrl(item.url)
+    }));
+  },
+
+  async updateProductMedia(
+    productId: string,
+    action: 'set_primary' | 'add_gallery' | 'remove_image' | 'reorder_gallery' | 'replace_image',
+    payload: {
+      imageUrl?: string;
+      imageUrls?: string[];
+      oldImageUrl?: string;
+      newImageUrl?: string;
+      images?: string[];
+    }
+  ): Promise<Product> {
+    const res = await apiFetch(`/api/products/${productId}/media`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify({ action, ...payload })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Failed to update product media' }));
+      throw new Error(err.error || 'Failed to update product media');
+    }
+    return await res.json();
   },
 
   // --- Environment & Site Configuration ---

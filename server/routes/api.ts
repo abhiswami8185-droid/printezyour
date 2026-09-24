@@ -43,15 +43,32 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage,
   limits: {
-    fileSize: 50 * 1024 * 1024 // 50 MB limit
+    fileSize: 100 * 1024 * 1024 // 100 MB limit
   },
   fileFilter: (_req, file, cb) => {
-    const allowedExts = ['.pdf', '.jpg', '.jpeg', '.png', '.webp', '.ai', '.psd', '.cdr', '.eps', '.zip', '.svg'];
+    const allowedExts = ['.pdf', '.jpg', '.jpeg', '.png', '.webp', '.ai', '.psd', '.cdr', '.eps', '.zip', '.svg', '.mp4', '.webm'];
     const ext = path.extname(file.originalname).toLowerCase();
-    if (allowedExts.includes(ext)) {
+    if (allowedExts.includes(ext) || file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/')) {
       cb(null, true);
     } else {
-      cb(new Error(`File type ${ext} not supported. Please upload PDF, AI, PSD, CDR, ZIP, PNG, WebP, or JPG.`));
+      cb(new Error(`File type ${ext} not supported. Please upload PDF, AI, PSD, CDR, ZIP, PNG, WebP, JPG, MP4, or WebM.`));
+    }
+  }
+});
+
+// Dedicated Media Showcase Multer (JPG, PNG, WEBP, MP4, WEBM up to 100MB)
+const mediaUpload = multer({
+  storage,
+  limits: {
+    fileSize: 100 * 1024 * 1024 // 100 MB limit
+  },
+  fileFilter: (_req, file, cb) => {
+    const allowedExts = ['.jpg', '.jpeg', '.png', '.webp', '.mp4', '.webm'];
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (allowedExts.includes(ext) || file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/')) {
+      cb(null, true);
+    } else {
+      cb(new Error(`File type ${ext} not supported. Home showcase and media management supports JPG, PNG, WEBP, MP4, and WEBM.`));
     }
   }
 });
@@ -895,3 +912,137 @@ apiRouter.get('/whatsapp/order-link/:id', (req, res) => {
   const link = whatsapp.getWaMeLink('918557049897', formatted);
   res.json({ link, formatted });
 });
+
+// ----------------------------------------------------
+// MEDIA MANAGEMENT (HOME SHOWCASE, PRODUCTS, SERVICES)
+// ----------------------------------------------------
+
+// Public & Admin: Fetch Showcase Media
+apiRouter.get('/media', (req, res) => {
+  const section = (req.query.section as string) || 'home_showcase';
+  const activeOnly = req.query.activeOnly === 'true' || req.query.activeOnly === '1';
+  const items = db.getMedia(section, activeOnly);
+  res.json(items);
+});
+
+// Admin: Upload Showcase Media (multiple or single JPG, PNG, WEBP, MP4, WEBM up to 100MB)
+apiRouter.post('/media/upload', requirePermission('media.upload'), mediaUpload.array('media', 20), (req: AuthenticatedRequest, res) => {
+  const files = (req.files as Express.Multer.File[]) || (req.file ? [req.file] : []);
+  if (!files || files.length === 0) {
+    res.status(400).json({ error: 'No files were uploaded. Please attach valid image or video files.' });
+    return;
+  }
+
+  const actor = req.authUser?.name || 'Super Admin';
+  const section = (req.body.section as 'home_showcase' | 'general') || 'home_showcase';
+
+  const createdItems = files.map(file => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const isVideo = file.mimetype.startsWith('video/') || ext === '.mp4' || ext === '.webm';
+    const type: 'image' | 'video' = isVideo ? 'video' : 'image';
+    const cleanTitle = path.basename(file.originalname, ext).replace(/[_-]/g, ' ');
+
+    return db.createMediaItem(
+      {
+        title: cleanTitle,
+        url: `/api/uploads/${file.filename}`,
+        thumbnailUrl: `/api/uploads/${file.filename}`,
+        type,
+        mimeType: file.mimetype,
+        fileSize: file.size,
+        section,
+        active: true,
+        caption: req.body.caption || ''
+      },
+      actor
+    );
+  });
+
+  res.status(201).json({
+    success: true,
+    count: createdItems.length,
+    items: createdItems,
+    item: createdItems[0]
+  });
+});
+
+// Admin: Reorder Showcase Media
+apiRouter.put('/media/reorder', requirePermission('media.reorder'), (req: AuthenticatedRequest, res) => {
+  const { orderedIds } = req.body;
+  if (!Array.isArray(orderedIds)) {
+    res.status(400).json({ error: 'orderedIds array is required for reordering' });
+    return;
+  }
+  const actor = req.authUser?.name || 'Super Admin';
+  const items = db.reorderMedia(orderedIds, actor);
+  res.json(items);
+});
+
+// Admin: Update Media Item (activate/deactivate, title, caption)
+apiRouter.put('/media/:id', requirePermission('media.edit'), (req: AuthenticatedRequest, res) => {
+  const actor = req.authUser?.name || 'Super Admin';
+  const updated = db.updateMediaItem(req.params.id, req.body, actor);
+  if (!updated) {
+    res.status(404).json({ error: 'Media item not found' });
+    return;
+  }
+  res.json(updated);
+});
+
+// Admin: Replace Media File
+apiRouter.post('/media/:id/replace', requirePermission('media.edit'), mediaUpload.single('media'), (req: AuthenticatedRequest, res) => {
+  if (!req.file) {
+    res.status(400).json({ error: 'Replacement file is required' });
+    return;
+  }
+
+  const ext = path.extname(req.file.originalname).toLowerCase();
+  const isVideo = req.file.mimetype.startsWith('video/') || ext === '.mp4' || ext === '.webm';
+  const type: 'image' | 'video' = isVideo ? 'video' : 'image';
+  const actor = req.authUser?.name || 'Super Admin';
+
+  const updated = db.replaceMediaFile(
+    req.params.id,
+    {
+      url: `/api/uploads/${req.file.filename}`,
+      mimeType: req.file.mimetype,
+      fileSize: req.file.size,
+      type
+    },
+    actor
+  );
+
+  if (!updated) {
+    res.status(404).json({ error: 'Media item not found' });
+    return;
+  }
+  res.json(updated);
+});
+
+// Admin: Delete Media Item
+apiRouter.delete('/media/:id', requirePermission('media.delete'), (req: AuthenticatedRequest, res) => {
+  const actor = req.authUser?.name || 'Super Admin';
+  const result = db.deleteMediaItem(req.params.id, actor);
+  if (!result.success) {
+    res.status(404).json({ error: result.message });
+    return;
+  }
+  res.json(result);
+});
+
+// Admin: Product Media Management
+apiRouter.put('/products/:id/media', requirePermission('products.edit'), (req: AuthenticatedRequest, res) => {
+  const { action, ...payload } = req.body;
+  if (!action) {
+    res.status(400).json({ error: 'Media action is required (set_primary, add_gallery, remove_image, reorder_gallery, replace_image)' });
+    return;
+  }
+  const actor = req.authUser?.name || 'Super Admin';
+  const updated = db.updateProductMedia(req.params.id, action, payload, actor);
+  if (!updated) {
+    res.status(404).json({ error: 'Product not found' });
+    return;
+  }
+  res.json(updated);
+});
+

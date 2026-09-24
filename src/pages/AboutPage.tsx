@@ -10,6 +10,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { getAssetUrl } from '../utils/assets';
+import aboutPlantPhoto from '../assets/images/about_plant_photo_1790256281618.jpg';
 
 interface AboutPageProps {
   onNavigate: (view: string, param?: string) => void;
@@ -61,13 +62,13 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
 
         <div className="rounded-3xl overflow-hidden shadow-xl border border-slate-200 bg-slate-100 aspect-4/3 relative">
           <img
-            src={getAssetUrl('/images/services/offset-printing.jpg')}
-            alt="Commercial printing press machinery"
+            src={aboutPlantPhoto || getAssetUrl('/images/about-plant.jpg')}
+            alt="Commercial color calibration & finishing plant machinery"
             className="w-full h-full object-cover"
             referrerPolicy="no-referrer"
             onError={(e) => {
               const target = e.currentTarget;
-              const fallback = getAssetUrl('/images/services/pamphlets-flyers.jpg');
+              const fallback = getAssetUrl('/images/about-plant.jpg');
               if (target.src !== fallback) {
                 target.src = fallback;
               }

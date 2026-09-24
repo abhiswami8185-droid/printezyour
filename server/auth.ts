@@ -249,7 +249,12 @@ export const ALL_PERMISSIONS: PermissionKey[] = [
   'settings.edit',
   'content.view',
   'content.edit',
-  'audit.view'
+  'audit.view',
+  'media.view',
+  'media.upload',
+  'media.edit',
+  'media.delete',
+  'media.reorder'
 ];
 
 // Compute Effective Permissions: (RolePermissions + Granted) - Revoked
